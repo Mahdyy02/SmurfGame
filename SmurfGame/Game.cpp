@@ -5,18 +5,14 @@
 
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
-
+SDL_Event Game::event;
 Map* map;
-
 auto& player(manager.addEntity());
 
-Game::Game() {
 
-}
+Game::Game() {}
 
-Game::~Game() {
-
-}
+Game::~Game() {}
 
 void Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
 	int flags = 0;
@@ -49,11 +45,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	player.addComponent<TransformComponent>();
 	player.addComponent<SpriteComponent>("sanfour.png");
-
+	player.addComponent<KeyboardController>();
 }
 
 void Game::handleEvents() {
-	SDL_Event event;
 	SDL_PollEvent(&event);
 	switch (event.type)
 	{
@@ -69,11 +64,6 @@ void Game::handleEvents() {
 void Game::update() {
 	manager.refresh();
 	manager.update();
-
-	player.getComponent<TransformComponent>().position.add(Vector2D(1, 0));
-	if (player.getComponent<TransformComponent>().position.x > 100) {
-		player.getComponent<SpriteComponent>().setTex("charchabil.png");
-	}
 }
 
 void Game::render() {
