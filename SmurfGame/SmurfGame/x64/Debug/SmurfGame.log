@@ -1,2 +1,5 @@
 ﻿  Game.cpp
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TransformComponent.h(54,20): warning C4244: '/=' : conversion de 'double' en 'float', perte possible de données
+  (compiler le fichier source 'Game.cpp')
+  
   SmurfGame.vcxproj -> C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\x64\Debug\SmurfGame.exe
