@@ -63,13 +63,13 @@ void Map::drawMap() {
 			switch (type)
 			{
 			case 0:
-				TextureManager::draw(this->grass, &this->src, &this->dest);
+				TextureManager::draw(this->grass, this->src, this->dest);
 				break;
 			case 1:
-				TextureManager::draw(this->water, &this->src, &this->dest);
+				TextureManager::draw(this->water, this->src, this->dest);
 				break;
 			case 2:
-				TextureManager::draw(this->mushroom, &this->src, &this->dest);
+				TextureManager::draw(this->mushroom, this->src, this->dest);
 				break;
 			default:
 				break;

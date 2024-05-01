@@ -8,8 +8,8 @@
 #include <bitset>
 #include <array>
 
-class Entity;
 class Component;
+class Entity;
 
 using ComponentID = std::size_t;
 inline ComponentID getComponentTypeID() {
@@ -53,7 +53,11 @@ public:
         }
     }
 
-    void draw() {}
+    void draw() {
+        for (auto& c : this->components) {
+            c->draw();
+        }
+    }
 
     bool isActive() const { return this->active; }
 
@@ -104,7 +108,7 @@ public:
 
     void refresh() {
         entities.erase(std::remove_if(entities.begin(), entities.end(),
-            [](const std::unique_ptr<Entity>& mEntity) {
+            [](const std::unique_ptr<Entity> &mEntity) {
                 return !mEntity->isActive();
             }), entities.end());
     }

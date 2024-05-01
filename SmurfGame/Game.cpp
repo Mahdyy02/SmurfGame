@@ -1,18 +1,13 @@
 #include "Game.h"
-#include "GameObject.h"
-#include "GameObject.h"
 #include "Map.h"
-#include "ECS.h"
 #include "Components.h"
 
-GameObject* player;
-GameObject* enemy;
+SDL_Renderer* Game::renderer = nullptr;
+Manager manager;
+
 Map* map;
 
-SDL_Renderer* Game::renderer = nullptr;
-
-Manager manager;
-auto& newPlayer(manager.addEntity());
+auto& player(manager.addEntity());
 
 Game::Game() {
 
@@ -48,12 +43,12 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		this->isRunning = false;
 	}
 	
-	map = new Map();
-	player = new GameObject("sanfour.png", 50, 50);
-	enemy = new GameObject("charchabil.png", 0, 0);
 
-	newPlayer.addComponent<PositionComponent>();
-	newPlayer.getComponent<PositionComponent>().setPos(500, 500);
+	map = new Map();
+
+	player.addComponent<PositionComponent>();
+	player.addComponent<SpriteComponent>("sanfour.png");
+
 }
 
 void Game::handleEvents() {
@@ -71,17 +66,18 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-	player->update();
-	enemy->update();
+	manager.refresh();
 	manager.update();
-	std::cout << newPlayer.getComponent<PositionComponent>().x() << " " << newPlayer.getComponent<PositionComponent>().y() << std::endl;
+
+	if (player.getComponent<PositionComponent>().x() > 100) {
+		player.getComponent<SpriteComponent>().setTex("charchabil.png");
+	}
 }
 
 void Game::render() {
 	SDL_RenderClear(this->renderer);
 	map->drawMap();
-	player->render();
-	enemy->render();
+	manager.draw();
 	SDL_RenderPresent(this->renderer);
 }
 
