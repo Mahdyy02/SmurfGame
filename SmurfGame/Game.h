@@ -3,6 +3,7 @@
 
 #include "SDL.h"
 #include "SDL_image.h"
+#include "TextureManager.h"
 #include <iostream>
 
 class Game {
@@ -18,10 +19,11 @@ public:
 	void clean();
 
 	bool running() { return this->isRunning; }
+
+	static SDL_Renderer *renderer;
 private:
 	bool isRunning;
 	SDL_Window* window;
-	SDL_Renderer* renderer;
 	int cnt;
 };
 

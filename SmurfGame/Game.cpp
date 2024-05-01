@@ -1,7 +1,18 @@
 #include "Game.h"
+#include "GameObject.h"
+#include "GameObject.h"
+#include "Map.h"
+#include "ECS.h"
+#include "Components.h"
 
-SDL_Texture* playerTex;
-SDL_Rect srcR, destR;
+GameObject* player;
+GameObject* enemy;
+Map* map;
+
+SDL_Renderer* Game::renderer = nullptr;
+
+Manager manager;
+auto& newPlayer(manager.addEntity());
 
 Game::Game() {
 
@@ -36,10 +47,13 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	else {
 		this->isRunning = false;
 	}
+	
+	map = new Map();
+	player = new GameObject("sanfour.png", 50, 50);
+	enemy = new GameObject("charchabil.png", 0, 0);
 
-	SDL_Surface* tmpSurafce = IMG_Load("sanfour.png");
-	playerTex = SDL_CreateTextureFromSurface(this->renderer, tmpSurafce);
-	SDL_FreeSurface(tmpSurafce);
+	newPlayer.addComponent<PositionComponent>();
+	newPlayer.getComponent<PositionComponent>().setPos(500, 500);
 }
 
 void Game::handleEvents() {
@@ -50,25 +64,6 @@ void Game::handleEvents() {
 	case SDL_QUIT:
 		this->isRunning = false;
 		break;
-	case SDL_KEYDOWN:
-		switch (event.key.keysym.sym)
-		{
-		case SDLK_UP:
-			destR.y -= 10;
-			break;
-		case SDLK_DOWN:
-			destR.y += 10;
-			break;
-		case SDLK_LEFT:
-			destR.x -= 10;
-			break;
-		case SDLK_RIGHT:
-			destR.x += 10;
-			break;
-		default:
-			break;
-		}
-		break;
 	default:
 		break;
 	}
@@ -76,36 +71,17 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-	cnt++;
-	destR.h = 64;
-	destR.w = 64;
-	std::cout << cnt << std::endl;
+	player->update();
+	enemy->update();
+	manager.update();
+	std::cout << newPlayer.getComponent<PositionComponent>().x() << " " << newPlayer.getComponent<PositionComponent>().y() << std::endl;
 }
 
 void Game::render() {
-	// Clear the renderer with black color
-	SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255); // Black
 	SDL_RenderClear(this->renderer);
-
-	// Render the player texture (assuming playerTex is a valid texture)
-	SDL_RenderCopy(renderer, playerTex, NULL, &destR);
-
-	// Draw the first red rectangle
-	SDL_Rect rect1 = { 10, 20, 500, 50 }; // x, y, width, height
-	SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255); 
-	SDL_RenderFillRect(this->renderer, &rect1);
-
-	// Draw the second green rectangle
-	SDL_Rect rect2 = { 60, 20, 50, 50 }; // x, y, width, height (adjust as needed)
-	SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255); 
-	SDL_RenderFillRect(this->renderer, &rect2);
-
-	// Draw the second green rectangle
-	SDL_Rect rect3 = { 60, 20, 50, 50 }; // x, y, width, height (adjust as needed)
-	SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255);
-	SDL_RenderFillRect(this->renderer, &rect2);
-
-	// Present the renderer to display the rendered content
+	map->drawMap();
+	player->render();
+	enemy->render();
 	SDL_RenderPresent(this->renderer);
 }
 
