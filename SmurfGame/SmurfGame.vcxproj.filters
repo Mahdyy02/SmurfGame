@@ -39,6 +39,9 @@
     <ClCompile Include="Collision.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="ECS.cpp">
+      <Filter>Fichiers d%27en-tête\ECS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="TileComponent.h">
+      <Filter>Fichiers d%27en-tête\ECS</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

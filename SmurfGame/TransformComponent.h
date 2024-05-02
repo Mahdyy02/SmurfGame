@@ -18,8 +18,7 @@ public:
 	int speed = 3;
 
 	TransformComponent() {
-		this->position.x = 0.0;
-		this->position.y = 0.0;
+		this->position.zero();
 	}
 
 	TransformComponent(float x, float y) {
@@ -36,26 +35,24 @@ public:
 	}
 
 	TransformComponent(int sc) {
-		this->position.x = 0.0;
-		this->position.y = 0.0;
+		this->position.zero();
 		this->scale = sc;
 	}
 
 	void init() override {
-		velocity.x = 0;
-		velocity.y = 0;
+		this->velocity.zero();
 	}
 
 	void update() override {
 
 		float tmpSpeed = (float)speed;
 
-		if (velocity.x != 0 && velocity.y != 0) {
+		if (this->velocity.x != 0 && this->velocity.y != 0) {
 			tmpSpeed /= sqrt(2);
 		}
 
-		position.x += velocity.x * tmpSpeed;
-		position.y += velocity.y * tmpSpeed;
+		this->position.x += this->velocity.x * tmpSpeed;
+		this->position.y += this->velocity.y * tmpSpeed;
 	}
 
 };

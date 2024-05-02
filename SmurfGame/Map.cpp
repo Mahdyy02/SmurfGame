@@ -1,84 +1,56 @@
 #include "Map.h"
-#include "TextureManager.h"
-
-int lvl1[20][25] = {
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, 
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-};
+#include "Game.h"
+#include <fstream>
+#include <string>
+#include <sstream>
 
 Map::Map() {
-	this->grass = TextureManager::loadTexture("grass.png"); //0
-	this->water = TextureManager::loadTexture("water.png"); //1
-	this->mushroom = TextureManager::loadTexture("mushroom.png"); //2
 
-	this->loadMap(lvl1);
-
-	this->src.x = 0;
-	this->src.y = 0;
-	this->src.h = 512;
-	this->src.w = 512;
-
-	this->dest.x = 0;
-	this->dest.y = 0;
-	this->dest.h = 32;
-	this->dest.w = 32;
 }
 
 Map::~Map() {
-	SDL_DestroyTexture(this->grass);
-	SDL_DestroyTexture(this->grass);
-	SDL_DestroyTexture(this->water);
+
 }
 
-void Map::loadMap(int arr[20][25]) {
-	for (int i = 0; i < 20; ++i) {
-		for (int j = 0; j < 25; ++j) {
-			this->map[i][j] = arr[i][j];
-		}
-	}
-}
+void Map::loadMap(std::string path, int sizeX, int sizeY) {
+    std::ifstream mapFile(path);
+    if (!mapFile.is_open()) {
+        std::cerr << "Error: Failed to open map file " << path << std::endl;
+        return;
+    }
 
-void Map::drawMap() {
+    std::string line;
+    for (int y = 0; y < sizeY; ++y) {
+        if (!std::getline(mapFile, line)) {
+            std::cerr << "Error: Failed to read line " << y + 1 << " from map file" << std::endl;
+            mapFile.close();
+            return;
+        }
 
-	int type = 0;
-	for (int i = 0; i < 20; ++i) {
-		for (int j = 0; j < 25; ++j) {
-			
-			type = this->map[i][j];
-			this->dest.x = j * 32;
-			this->dest.y = i * 32;
+        std::istringstream iss(line);
+        std::string tileStr;
+        for (int x = 0; x < sizeX; ++x) {
+            if (!std::getline(iss, tileStr, ',')) {
+                std::cerr << "Error: Failed to read tile at row " << y + 1 << ", column " << x + 1 << std::endl;
+                mapFile.close();
+                return;
+            }
 
-			switch (type){
-			case 0:
-				TextureManager::draw(this->grass, this->src, this->dest);
-				break;
-			case 1:
-				TextureManager::draw(this->water, this->src, this->dest);
-				break;
-			case 2:
-				TextureManager::draw(this->mushroom, this->src, this->dest);
-				break;
-			default:
-				break;
-			}
-		}
-	}
+            try {
+                int tileIndex = std::stoi(tileStr);
+                Game::addTile(tileIndex, x * 32, y * 32);
+            }
+            catch (const std::invalid_argument& e) {
+                std::cerr << "Error: Invalid tile index at row " << y + 1 << ", column " << x + 1 << std::endl;
+                mapFile.close();
+                return;
+            }
+            catch (const std::out_of_range& e) {
+                std::cerr << "Error: Tile index out of range at row " << y + 1 << ", column " << x + 1 << std::endl;
+                mapFile.close();
+                return;
+            }
+        }
+    }
+    mapFile.close();
 }
