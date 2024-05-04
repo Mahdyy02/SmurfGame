@@ -1,7 +1,7 @@
 #include "SDL.h"
 #include "Game.h"
 
-#define WIDTH 900
+#define WIDTH 1200
 #define HEIGHT 900
 #define FPS 80
 #define FrameDelay 12.5 

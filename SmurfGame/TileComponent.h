@@ -11,37 +11,40 @@
 
 class TileComponent : public Component {
 public:
-	TransformComponent* transform;
-	SpriteComponent* sprite;
-
-	SDL_Rect tileRect;
-	int tileID;
-	const char* path;
+	SDL_Texture* texture;
+	SDL_Rect srcRect, destRect;
+	Vector2D position;
 
 	TileComponent() = default;
 
 	~TileComponent() {
-		delete[] this->path;
+		SDL_DestroyTexture(this->texture);
 	}
 
-	TileComponent(int x, int y, int w, int h, int id) {
-		this->tileRect.x = x;
-		this->tileRect.y = y;
-		this->tileRect.w = w;
-		this->tileRect.h = h;
-		this->tileID = id;
+	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, const char *path) {
+		this->texture = TextureManager::loadTexture(path);
 
-		std::string pathStr = "map/" + std::to_string(id) + ".png";
-		path = new char[pathStr.length() + 1];
-		strcpy_s(const_cast<char*>(path), pathStr.length() + 1, pathStr.c_str());
+		this->position.x = xpos;
+		this->position.y = ypos;
+		
+		this->srcRect.x = srcX;
+		this->srcRect.y = srcY;
+		this->srcRect.w = this->srcRect.h = tsize;
+
+		this->destRect.x = xpos;
+		this->destRect.y = ypos;
+		this->destRect.w = this->destRect.h = tsize*tscale;
 	}
 
-	void init() override {
-		this->entity->addComponent<TransformComponent>((float)this->tileRect.x, (float)this->tileRect.y, this->tileRect.w, this->tileRect.h, 1);
-		this->transform = &this->entity->getComponent<TransformComponent>();
-		this->entity->addComponent<SpriteComponent>(this->path);
-		this->sprite = &this->entity->getComponent<SpriteComponent>();
+	void draw() {
+		TextureManager::draw(texture, srcRect, destRect, SDL_FLIP_NONE);
 	}
+
+	void update() override { 
+		this->destRect.x = this->position.x - Game::camera.x;
+		this->destRect.y = this->position.y - Game::camera.y;
+	}
+
 };
 
 #endif // !TILECOMPONENT_H

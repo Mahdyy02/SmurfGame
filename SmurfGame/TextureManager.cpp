@@ -23,8 +23,8 @@ SDL_Texture* TextureManager::loadTexture(const char* filename) {
 }
 
 
-void TextureManager::draw(SDL_Texture* tex, SDL_Rect src, SDL_Rect dest) {
-    if (SDL_RenderCopy(Game::renderer, tex, &src, &dest) != 0) {
+void TextureManager::draw(SDL_Texture* tex, SDL_Rect src, SDL_Rect dest, SDL_RendererFlip flip) {
+    if (SDL_RenderCopyEx(Game::renderer, tex, &src, &dest, NULL, NULL, flip) != 0) {
         std::cout << "Failed to render texture. Error: " << SDL_GetError() << std::endl;
         exit(EXIT_FAILURE);
     }

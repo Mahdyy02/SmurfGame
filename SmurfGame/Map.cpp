@@ -3,54 +3,46 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include "ECS.h"
+#include "Components.h"
 
-Map::Map() {
+extern Manager manager;
 
-}
+Map::Map(const char* mfp, int ms, int ts): mapFilePath(mfp), mapScale(ms), tileSize(ts) {}
 
 Map::~Map() {
 
 }
 
-void Map::loadMap(std::string path, int sizeX, int sizeY) {
-    std::ifstream mapFile(path);
-    if (!mapFile.is_open()) {
-        std::cerr << "Error: Failed to open map file " << path << std::endl;
-        return;
-    }
+void Map::loadMap(std::string path,  int sizeX, int sizeY) {
 
-    std::string line;
-    for (int y = 0; y < sizeY; ++y) {
-        if (!std::getline(mapFile, line)) {
-            std::cerr << "Error: Failed to read line " << y + 1 << " from map file" << std::endl;
-            mapFile.close();
-            return;
-        }
+	std::fstream mapFile;
+	mapFile.open(path);
+	char c;
 
-        std::istringstream iss(line);
-        std::string tileStr;
-        for (int x = 0; x < sizeX; ++x) {
-            if (!std::getline(iss, tileStr, ',')) {
-                std::cerr << "Error: Failed to read tile at row " << y + 1 << ", column " << x + 1 << std::endl;
-                mapFile.close();
-                return;
-            }
+	for (int y = 0; y < sizeY; ++y) {
+		for (int x = 0; x < sizeX; ++x) {
+			addTile(x * this->tileSize, y * this->tileSize, x * this->tileSize*this->mapScale, y * this->tileSize * this->mapScale);
+		}
+	}
 
-            try {
-                int tileIndex = std::stoi(tileStr);
-                Game::addTile(tileIndex, x * 32, y * 32);
-            }
-            catch (const std::invalid_argument& e) {
-                std::cerr << "Error: Invalid tile index at row " << y + 1 << ", column " << x + 1 << std::endl;
-                mapFile.close();
-                return;
-            }
-            catch (const std::out_of_range& e) {
-                std::cerr << "Error: Tile index out of range at row " << y + 1 << ", column " << x + 1 << std::endl;
-                mapFile.close();
-                return;
-            }
-        }
-    }
-    mapFile.close();
+	for (int y = 0; y < sizeY; ++y) {
+		for (int x = 0; x < sizeX; ++x) {
+			mapFile.get(c);
+			if (c == '1') {
+				auto& tcol(manager.addEntity());
+				tcol.addComponent<ColliderComponent>("terrain", x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale, this->tileSize * this->mapScale);
+				tcol.addGroup(Game::groupColliders);
+			}
+			mapFile.ignore();
+		}
+	}
+
+	mapFile.close();
+}
+
+void Map::addTile(int srcX, int srcY, int xpos, int ypos) {
+	auto& tile(manager.addEntity());
+	tile.addComponent<TileComponent>(srcX, srcY, xpos, ypos, this->tileSize, this->mapScale, this->mapFilePath);
+	tile.addGroup(Game::groupMap);
 }
