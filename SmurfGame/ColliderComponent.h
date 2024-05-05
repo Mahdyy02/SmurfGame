@@ -5,6 +5,8 @@
 #include <SDL.h>
 #include "Components.h"
 #include "TextureManager.h"
+#include "AssetManager.h"
+#include "Game.h"
 
 class ColliderComponent : public Component {
 public:
@@ -32,7 +34,7 @@ public:
 		}
 		this->transform = &entity->getComponent<TransformComponent>();
 
-		tex = TextureManager::loadTexture("test.png");
+		this->tex = Game::assets->getTexture("collider");
 		this->srcR = {0,0,512,512};
 		this->destR = { collider.x, collider.y, collider.w, collider.h };
 	}

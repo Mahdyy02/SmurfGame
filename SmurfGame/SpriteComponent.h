@@ -25,12 +25,12 @@ public:
 
 	SpriteComponent() = default;
 
-	SpriteComponent(const char* path) {
-		this->setTex(path);
+	SpriteComponent(std::string id) {
+		this->setTex(id);
 	}
 
-	SpriteComponent(const char* path, bool isAnimated) {
-		this->setTex(path);
+	SpriteComponent(std::string id, bool isAnimated) {
+		
 		this->animated = isAnimated;
 
 		Animation idle = Animation(0, 3, 100);
@@ -40,14 +40,14 @@ public:
 		this->animations.emplace("walk", walk); 
 
 		this->play("idle");
+
+		this->setTex(id);
 	}
 
-	~SpriteComponent() {
-		SDL_DestroyTexture(this->texture);
-	}
+	~SpriteComponent() {}
 
-	void setTex(const char* path) {
-		texture = TextureManager::loadTexture(path);
+	void setTex(std::string id) {
+		texture = Game::assets->getTexture(id);
 	}
 
 	void init() override {

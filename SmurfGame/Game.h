@@ -1,13 +1,15 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <iostream>
+#include <vector>
 #include "SDL.h"
 #include "SDL_image.h"
 #include "TextureManager.h"
-#include <iostream>
-#include <vector>
+#include "AssetManager.h"
 
 class ColliderComponent;
+class AssetManager;
 
 class Game {
 public:
@@ -26,13 +28,15 @@ public:
 	static SDL_Renderer *renderer;
 	static SDL_Event event;
 	static SDL_Rect camera;
+	static AssetManager *assets;
 	static bool isRunning;
 
 	enum groupLabels : std::size_t {
 		groupMap,
 		groupPlayers,
 		groupEnemies,
-		groupColliders
+		groupColliders,
+		GroupProjectiles
 	};
 
 private:
