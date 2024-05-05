@@ -20,6 +20,7 @@ public:
 		distance += speed;
 
 		if (this->distance > this->range) {
+			std::cout << "Out of range!" << std::endl;
 			this->entity->destroy();
 		}
 		else if (this->transform->position.x > Game::camera.x + Game::camera.w ||
@@ -27,6 +28,7 @@ public:
 				this->transform->position.y > Game::camera.y + Game::camera.h ||
 				this->transform->position.y < Game::camera.y) 
 		{
+			std::cout << "Out of bounds!" << std::endl;
 			this->entity->destroy();
 		}
 	}

@@ -156,6 +156,7 @@
     <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="UILabel.h" />
     <ClInclude Include="Vector2D.h" />
   </ItemGroup>
   <ItemGroup>
