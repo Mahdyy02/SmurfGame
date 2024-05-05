@@ -1,10 +1,11 @@
 #include "SDL.h"
 #include "Game.h"
 
-#define WIDTH 1200
-#define HEIGHT 900
 #define FPS 80
 #define FrameDelay 12.5 
+
+int Game::screenWidth = 1200;
+int Game::screenHeight = 900;
 
 Game* game = nullptr;
 
@@ -14,7 +15,7 @@ int frameTime;
 int main(int argc, char* argv[]) {
 
 	game = new Game();
-	game->init("SaneferPawPaw", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
+	game->init("SaneferPawPaw", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0);
 
 	while (game->running()) {
 

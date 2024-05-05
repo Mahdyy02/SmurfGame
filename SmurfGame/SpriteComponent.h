@@ -68,8 +68,8 @@ public:
 
 		this->srcRect.y = this->animIndex * 512;
 
-		this->destRect.x = static_cast<int>(this->transform->position.x);
-		this->destRect.y = static_cast<int>(this->transform->position.y);
+		this->destRect.x = static_cast<int>(this->transform->position.x) - Game::camera.x;
+		this->destRect.y = static_cast<int>(this->transform->position.y) - Game::camera.y;
 
 		destRect.w = this->transform->width * this->transform->scale;
 		destRect.h = this->transform->height * this->transform->scale;

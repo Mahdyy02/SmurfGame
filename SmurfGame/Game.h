@@ -16,7 +16,7 @@ public:
 	Game();
 	~Game();
 
-	void init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
+	void init(const char* title, int xpos, int ypos, bool fullscreen);
 
 	void handleEvents();
 	void update();
@@ -30,6 +30,9 @@ public:
 	static SDL_Rect camera;
 	static AssetManager *assets;
 	static bool isRunning;
+
+	static int screenHeight;
+	static int screenWidth;
 
 	enum groupLabels : std::size_t {
 		groupMap,

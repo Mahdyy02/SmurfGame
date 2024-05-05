@@ -9,7 +9,7 @@ SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
 SDL_Event Game::event;
 
-SDL_Rect Game::camera ={0,0,960,680 };
+SDL_Rect Game::camera ={0, 0, 7680, 3840 };
 
 AssetManager* Game::assets = new AssetManager(&manager);
 
@@ -25,7 +25,7 @@ Game::Game() {}
 
 Game::~Game() {}
 
-void Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
+void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	int flags = 0;
 	if (fullscreen) {
 		flags = SDL_WINDOW_FULLSCREEN;
@@ -33,8 +33,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
 		std::cout << "Subsystems initialised!..." << std::endl;
-		this->window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-
+		this->window = SDL_CreateWindow(title, xpos, ypos, screenWidth, screenHeight, flags);
 
 		if (this->window) {
 			std::cout << "Window created succesfully..." << std::endl;
@@ -55,7 +54,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		std::cout << "Error: SDL_TTF" << std::endl;
 	}
 
-	assets->addTexture("terrain", "map.jpg");
+	assets->addTexture("terrain", "map.png");
 	assets->addTexture("player", "animated_smurf.png");
 	assets->addTexture("projectile", "charchabil.png");
 	assets->addTexture("collider", "test.png");
@@ -64,9 +63,9 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	
 	map = new Map("terrain", 3, 32);
 
-	map->loadMap("map.map", 30, 20);
+	map->loadMap("map.map", 80, 40);
 
-	player.addComponent<TransformComponent>(300,500,32,32,3);
+	player.addComponent<TransformComponent>(600,450,32,32,3);
 	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
 	player.addComponent<ColliderComponent>("player");
@@ -75,7 +74,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	SDL_Color white = { 255,255,255, 255 };
 	label.addComponent<UILabel>(10, 10, "SaneferPawPaw", "arial", white);
 
-	assets->createProjectile(Vector2D(500, 400), Vector2D(0,0), 1, 0, "projectile");
+	assets->createProjectile(Vector2D(500, 400), Vector2D(1,0), 1, 0, "projectile");
 }
 
 auto& tiles(manager.getGroup(Game::groupMap));
@@ -102,19 +101,11 @@ void Game::update() {
 	Vector2D playerPos = player.getComponent<TransformComponent>().position;
 
 	std::stringstream ss;
-	ss << "Player position: (" << playerPos.x << ", " << playerPos.y << ")";; // here is the error
+	ss << "Player position: (" << playerPos.x << ", " << playerPos.y << ")";
 	label.getComponent<UILabel>().setLabelText(std::move(ss).str(), "arial");
 
 	manager.refresh();
 	manager.update();
-	
-
-	if (player.getComponent<TransformComponent>().position.x > 1134
-		|| player.getComponent<TransformComponent>().position.y > 836
-		|| player.getComponent<TransformComponent>().position.x < 0
-		|| player.getComponent<TransformComponent>().position.y < 0) {
-		player.getComponent<TransformComponent>().position = playerPos;
-	}
 
 	for (auto& c : colliders) {
 
@@ -136,13 +127,15 @@ void Game::update() {
 		}
 	}
 
-	camera.x = player.getComponent<TransformComponent>().position.x - 200;
-	camera.y = player.getComponent<TransformComponent>().position.y - 200;
+	camera.x = player.getComponent<TransformComponent>().position.x - Game::screenWidth/2;
+	camera.y = player.getComponent<TransformComponent>().position.y - Game::screenHeight/2;
+
 
 	if (camera.x < 0) camera.x = 0;
-	if (camera.y < 0) camera.y = 0;
-	if (camera.x > camera.w) camera.x = camera.w;
-	if (camera.y > camera.h) camera.y = camera.h;
+	if (camera.y < 0) camera.y = 0; 
+	if (camera.x > camera.w - screenWidth) camera.x = camera.w - screenWidth;
+	if (camera.y > camera.h - screenHeight) camera.y = camera.h - screenHeight;
+	
 }
 
 void Game::render() {

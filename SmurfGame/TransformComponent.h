@@ -15,7 +15,7 @@ public:
 	int width = 32;
 	int scale = 1;
 
-	int speed = 1;
+	int speed = 5;
 
 	TransformComponent() {
 		this->position.zero();
@@ -44,7 +44,6 @@ public:
 	}
 
 	void update() override {
-
 		this->position.x += this->velocity.x * this->speed;
 		this->position.y += this->velocity.y * this->speed;
 	}
