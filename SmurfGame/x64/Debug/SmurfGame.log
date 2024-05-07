@@ -1,2 +1,71 @@
-﻿  main.cpp
+﻿  AssetManager.cpp
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(27,22): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+  (compiler le fichier source 'AssetManager.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(28,22): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+  (compiler le fichier source 'AssetManager.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(44,39): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+  (compiler le fichier source 'AssetManager.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(45,39): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+  (compiler le fichier source 'AssetManager.cpp')
+  
+  Collision.cpp
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(27,22): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+  (compiler le fichier source 'Collision.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(28,22): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+  (compiler le fichier source 'Collision.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(44,39): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+  (compiler le fichier source 'Collision.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(45,39): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+  (compiler le fichier source 'Collision.cpp')
+  
+  Game.cpp
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(27,22): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+  (compiler le fichier source 'Game.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(28,22): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+  (compiler le fichier source 'Game.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(44,39): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+  (compiler le fichier source 'Game.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(45,39): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+  (compiler le fichier source 'Game.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(132,66): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(133,66): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41): warning C4244: 'argument' : conversion de '_Ty' en 'float', perte possible de données
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41): warning C4244:         with
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41): warning C4244:         [
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41): warning C4244:             _Ty=int
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41): warning C4244:         ]
+  (compiler le fichier source 'Game.cpp')
+  C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41):
+  le contexte d’instanciation du modèle (le plus ancien) est
+  	C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(72,8):
+  	voir la référence à l'instanciation de la fonction modèle 'T &Entity::addComponent<TransformComponent,int,int,int,int,int>(int &&,int &&,int &&,int &&,int &&)' en cours de compilation
+          with
+          [
+              T=TransformComponent
+          ]
+  
+  Map.cpp
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(27,22): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+  (compiler le fichier source 'Map.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(28,22): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+  (compiler le fichier source 'Map.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(44,39): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+  (compiler le fichier source 'Map.cpp')
+  
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(45,39): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+  (compiler le fichier source 'Map.cpp')
+  
+  Génération de code en cours...
   SmurfGame.vcxproj -> C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\x64\Debug\SmurfGame.exe
