@@ -5,15 +5,19 @@
 #include "Collision.h"
 #include <sstream>
 
+int Game::screenWidth = 1800;
+int Game::screenHeight = 900;
+
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
 SDL_Event Game::event;
 
-SDL_Rect Game::camera ={0, 0, 7680, 3840 };
+SDL_Rect Game::camera ={0, 0, 8192*1, 4096 *1 };
 
 AssetManager* Game::assets = new AssetManager(&manager);
 
 auto& player(manager.addEntity());
+
 auto& label(manager.addEntity());
 
 Map* map;
@@ -57,22 +61,22 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	assets->addTexture("terrain", "map.png");
 	assets->addTexture("player", "animated_smurf.png");
 	assets->addTexture("projectile", "charchabil.png");
-	assets->addTexture("collider", "test.png");
+	assets->addTexture("collider", "empty.png");
 
 	assets->addFont("arial", "arial.ttf", 16);
 	
-	map = new Map("terrain", 3, 32);
+	map = new Map("terrain", 1, 32);
 
-	map->loadMap("map.map", 80, 40);
+	map->loadMap("map.map", 256, 128);
 
-	player.addComponent<TransformComponent>(600,450,32,32,3);
+	player.addComponent<TransformComponent>(470,2327,32,32,3);
 	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
 	player.addComponent<ColliderComponent>("player");
 	player.addGroup(groupPlayers);
 
 	SDL_Color white = { 255,255,255, 255 };
-	label.addComponent<UILabel>(10, 10, "SaneferPawPaw", "arial", white);
+	label.addComponent<UILabel>(10, 10, "SaneferPawPaw", "arial", white, true);
 
 	assets->createProjectile(Vector2D(500, 400), Vector2D(1,0), 1, 0, "projectile");
 }
@@ -81,6 +85,7 @@ auto& tiles(manager.getGroup(Game::groupMap));
 auto& players(manager.getGroup(Game::groupPlayers));
 auto& colliders(manager.getGroup(Game::groupColliders));
 auto& projectiles(manager.getGroup(Game::GroupProjectiles));
+auto& labels(manager.getGroup(Game::groupLabels));
 
 void Game::handleEvents() {
 	SDL_PollEvent(&event);
@@ -110,14 +115,11 @@ void Game::update() {
 	for (auto& c : colliders) {
 
 		SDL_Rect cCol = c->getComponent<ColliderComponent>().collider;
-		cCol.x -= Game::camera.x;
-		cCol.y -= Game::camera.y;
 
 		Collision::AABB(cCol, playerCol);
 		if(Collision::AABB(cCol, playerCol)) {
 			player.getComponent<TransformComponent>().position = playerPos;
 		}
-
 	}
 
 	for (auto& p : projectiles) {
@@ -154,6 +156,10 @@ void Game::render() {
 
 	for (auto& p : projectiles) {
 		p->draw();
+	}
+
+	for (auto& l : labels) {
+		l->draw();
 	}
 
 	label.draw();

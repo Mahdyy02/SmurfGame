@@ -4,9 +4,6 @@
 #define FPS 80
 #define FrameDelay 12.5 
 
-int Game::screenWidth = 1200;
-int Game::screenHeight = 900;
-
 Game* game = nullptr;
 
 Uint32 frameStart;

@@ -39,7 +39,8 @@ public:
 		groupPlayers,
 		groupEnemies,
 		groupColliders,
-		GroupProjectiles
+		GroupProjectiles,
+		groupLabels
 	};
 
 private:
