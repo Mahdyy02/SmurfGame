@@ -7,7 +7,7 @@
 
 class ProjectileComponent : public Component {
 public:
-	ProjectileComponent(int rng, int sp, Vector2D vel): range(rng), speed(sp), velocity(vel) {}
+	ProjectileComponent(int rng, int sp, Vector2D vel , int isPo):range(rng), speed(sp), velocity(vel) , isPotion(isPo) {}
 	~ProjectileComponent(){}
 
 	void init() override {
@@ -23,10 +23,10 @@ public:
 			std::cout << "Out of range!" << std::endl;
 			this->entity->destroy();
 		}
-		else if (this->transform->position.x > Game::camera.x + Game::camera.w ||
+		else if ((this->transform->position.x > Game::camera.x + Game::camera.w ||
 				this->transform->position.x < Game::camera.x ||
 				this->transform->position.y > Game::camera.y + Game::camera.h ||
-				this->transform->position.y < Game::camera.y) 
+				this->transform->position.y < Game::camera.y) && !isPotion )
 		{
 			std::cout << "Out of bounds!" << std::endl;
 			this->entity->destroy();
@@ -39,6 +39,7 @@ private:
 	int range;
 	int speed;
 	int distance;
+	bool isPotion;
 
 	Vector2D velocity;
 };

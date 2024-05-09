@@ -25,6 +25,8 @@ auto& labelHP(manager.addEntity());
 
 Map* map;
 Sound* backgroundMusic;
+Sound* bluePotionSound;
+Sound* redPotionSound;
 
 bool Game::isRunning = false;
 
@@ -80,10 +82,16 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	assets->addTexture("HP80", "hp_80.png");
 	assets->addTexture("HP100", "hp_100.png");
 
+	assets->addTexture("redPotion", "red_potion.png");
+	assets->addTexture("bluePotion", "blue_potion.png");
+
 	assets->addFont("arial", "arial.ttf", 16);
 
 	assets->addSound("background", "background_music.wav");
 	assets->addSound("walk", "walk.wav");
+
+	assets->addSound("redPotionSound", "red_potion.wav");
+	assets->addSound("bluePotionSound", "blue_potion.wav");
 	
 	map = new Map("terrain", 1, 32);
 
@@ -110,15 +118,24 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 
 	assets->createProjectile(Vector2D(640, 2400), Vector2D(1,0), 1, 0, "projectile");
 
+	assets->createProjectile(Vector2D(400,2550),Vector2D(0,0),1,0,"redPotion",1);
+	assets->createProjectile(Vector2D(550, 2550), Vector2D(0, 0), 1, 0, "bluePotion", 2);
+
 	backgroundMusic = new Sound("background", 0.1);
 	backgroundMusic->play(-1);
+
+	redPotionSound = new Sound("redPotionSound", 1);
+	bluePotionSound = new Sound("bluePotionSound", 1);
 }
 
 auto& tiles(manager.getGroup(Game::groupMap));
 auto& players(manager.getGroup(Game::groupPlayers));
 auto& colliders(manager.getGroup(Game::groupColliders));
-auto& projectiles(manager.getGroup(Game::GroupProjectiles));
+auto& projectiles(manager.getGroup(Game::groupProjectiles));
 auto& labels(manager.getGroup(Game::groupLabels));
+
+auto& redPotions(manager.getGroup(Game::groupeRedPotions));
+auto& bluePotions(manager.getGroup(Game::groupeBluePotions));
 
 void Game::handleEvents() {
 	SDL_PollEvent(&event);
@@ -132,6 +149,8 @@ void Game::handleEvents() {
 	}
 
 }
+
+
 
 void Game::update() {
 
@@ -162,6 +181,24 @@ void Game::update() {
 			p->destroy();
 		}
 	}
+
+	for (auto& r : redPotions) {
+		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, r->getComponent<ColliderComponent>().collider)) {
+			health.getComponent<HealthComponent>().increaseHP(30);
+			redPotionSound->play(0);
+			r->destroy();
+		}
+	}
+
+	for (auto& b : bluePotions) {
+		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, b->getComponent<ColliderComponent>().collider)) {
+			health.getComponent<HealthComponent>().increaseHP(60);
+			bluePotionSound->play(0);
+			b->destroy();
+		}
+	}
+
+
 
 	camera.x = player.getComponent<TransformComponent>().position.x - Game::screenWidth/2;
 	camera.y = player.getComponent<TransformComponent>().position.y - Game::screenHeight/2;
@@ -230,6 +267,16 @@ void Game::render() {
 	labelHP.draw();
 
 	health.draw();
+
+	for (auto& r: redPotions)
+	{
+		r->draw();
+	}
+
+	for (auto& b : bluePotions)
+	{
+		b->draw();
+	}
 
 	SDL_RenderPresent(this->renderer);
 }

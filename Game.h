@@ -40,8 +40,10 @@ public:
 		groupPlayers,
 		groupEnemies,
 		groupColliders,
-		GroupProjectiles,
-		groupLabels
+		groupProjectiles,
+		groupLabels,
+		groupeRedPotions,
+		groupeBluePotions
 	};
 
 private:
