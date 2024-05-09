@@ -4,6 +4,7 @@
 #include "Vector2D.h"
 #include "Collision.h"
 #include <sstream>
+#include "Sound.h"
 
 int Game::screenWidth = 1800;
 int Game::screenHeight = 900;
@@ -21,6 +22,7 @@ auto& player(manager.addEntity());
 auto& label(manager.addEntity());
 
 Map* map;
+Sound* backgroundMusic;
 
 bool Game::isRunning = false;
 
@@ -54,16 +56,14 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 		isRunning = false;
 	}
 
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-		SDL_Log("Unable to initialize SDL_mixer: %s", Mix_GetError());
-		isRunning = false;
-	}
-	else {
-		isRunning = true;
-	}
-
 	if (TTF_Init() == -1) {
 		std::cout << "Error: SDL_TTF" << std::endl;
+	}
+
+	Mix_Init(MIX_INIT_MP3);
+
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
 	}
 
 	assets->addTexture("terrain", "map.png");
@@ -73,7 +73,8 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 
 	assets->addFont("arial", "arial.ttf", 16);
 
-	assets->addSound("background", "");
+	assets->addSound("background", "background_music.wav");
+	assets->addSound("walk", "walk.wav");
 	
 	map = new Map("terrain", 1, 32);
 
@@ -83,12 +84,18 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
 	player.addComponent<ColliderComponent>("player");
+	player.addComponent<SoundComponent>();
+	player.getComponent<SoundComponent>().addSound("walk","walk");
 	player.addGroup(groupPlayers);
 
 	SDL_Color white = { 255,255,255, 255 };
 	label.addComponent<UILabel>(10, 10, "SaneferPawPaw", "arial", white, true);
+	label.addGroup(Game::groupLabels);
 
-	assets->createProjectile(Vector2D(500, 400), Vector2D(1,0), 1, 0, "projectile");
+	assets->createProjectile(Vector2D(640, 2400), Vector2D(1,0), 1, 0, "projectile");
+
+	backgroundMusic = new Sound("background", 0.1);
+	backgroundMusic->play(-1);
 }
 
 auto& tiles(manager.getGroup(Game::groupMap));
@@ -181,8 +188,7 @@ void Game::render() {
 void Game::clean() {
 	SDL_DestroyWindow(this->window);
 	SDL_DestroyRenderer(this->renderer);
-	//    Mix_FreeMusic(music);
-	Mix_CloseAudio();
+	Mix_Quit();
 	SDL_Quit();
 	std::cout << "Game cleaned" << std::endl;
 }

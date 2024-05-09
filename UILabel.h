@@ -10,7 +10,7 @@
 
 class UILabel : public Component {
 public:
-	UILabel(int xpos, int ypos, std::string text, std::string font, SDL_Color& colour, bool f): labelText(text), labelFont(font), textColour(colour), fixed(f) {
+	UILabel(int xpos, int ypos, std::string text, std::string font, SDL_Color& colour, bool f) : labelText(text), labelFont(font), textColour(colour), fixed(f) {
 
 		this->position.x = xpos;
 		this->position.y = ypos;
@@ -20,7 +20,7 @@ public:
 
 		this->setLabelText(this->labelText, this->labelFont);
 	}
-	~UILabel(){}
+	~UILabel() {}
 
 	void setLabelText(std::string text, std::string font) {
 		SDL_Surface* surf = TTF_RenderText_Blended(Game::assets->getFont(font), text.c_str(), this->textColour);
@@ -30,7 +30,7 @@ public:
 		SDL_QueryTexture(this->labelTexture, nullptr, nullptr, &cameraPosition.w, &cameraPosition.h);
 	}
 
-	void update() override{
+	void update() override {
 
 		if (!this->fixed) {
 			this->cameraPosition.x = this->position.x - Game::camera.x;

@@ -31,14 +31,9 @@ TTF_Font* AssetManager::getFont(std::string id) {
 }
 
 void AssetManager::addSound(std::string id, std::string path) {
-	this->sounds.emplace(id, Mix_LoadMUS(path.c_str()));
-
-	if (!this->sounds[id]) {
-		SDL_Log("Failed to load music: %s", Mix_GetError());
-	}
-
+	this->sounds.emplace(id, Mix_LoadWAV(path.c_str()));
 }
 
-Mix_Music* AssetManager::getSound(std::string id) {
+Mix_Chunk* AssetManager::getSound(std::string id) {
 	return this->sounds[id];
 }

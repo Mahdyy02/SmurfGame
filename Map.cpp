@@ -44,7 +44,6 @@ void Map::loadMap(std::string path,  int sizeX, int sizeY) {
 		for (int x = 0; x < sizeX; ++x) {
 			mapFile.get(c);
 			if (c == '1') {
-				std::cout << x << " " << y << std::endl;
 				auto& label(manager.addEntity());
 				SDL_Color white = { 255,255,255, 255 };
 				label.addComponent<UILabel>(x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale, "Press E to enter", "arial", white, false);

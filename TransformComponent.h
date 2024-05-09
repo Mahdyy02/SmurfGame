@@ -15,7 +15,7 @@ public:
 	int width = 32;
 	int scale = 1;
 
-	int speed = 1;
+	int speed = 2;
 
 	TransformComponent() {
 		this->position.zero();

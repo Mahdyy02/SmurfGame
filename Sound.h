@@ -1,38 +1,33 @@
-#ifndef MUSICCOMPONENT_H
-#define MUSICCOMPONENT_H
+#ifndef SOUND_H
+#define SOUND_H
 
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include "Game.h"
+#include <iostream>
+#include "AssetManager.h"
 
 class Sound {
 
 public:
 
-	Sound();
+	int channel;
+
+	Sound(std::string id, float volume);
 	~Sound();
 
 	bool isPlaying() { return this->playing; }
-
-	void play(int times) {
-		if (!this->playing) {
-			this->playing = true;
-			Mix_PlayMusic(this->sound, times);
-		}
-	}
-
-	void stop() {
-		this->playing = false;
-	}
-
-	void setMusic(std::string id) {
-		this->sound = Game::assets->getSound(id);
-	}
-
+	void setSound(std::string id);
+	void play(int times);
+	void stop();
+	void setVolume(float v);
 
 private:
 	bool playing = false;
-	Mix_Music* sound;
+	Mix_Chunk* sound = nullptr;
+	float volume;
+	static int getNextChannelID();
+
 };
 
-#endif // !MUSICCOMPONENT_H
+#endif // !SOUND_H
