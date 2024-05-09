@@ -45,6 +45,9 @@
     <ClCompile Include="ECS.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -96,6 +99,12 @@
       <Filter>Fichiers d%27en-tête\ECS</Filter>
     </ClInclude>
     <ClInclude Include="UILabel.h">
+      <Filter>Fichiers d%27en-tête\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundComponent.h">
       <Filter>Fichiers d%27en-tête\ECS</Filter>
     </ClInclude>
   </ItemGroup>
