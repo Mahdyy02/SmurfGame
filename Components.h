@@ -10,6 +10,7 @@
 #include "ProjectileComponent.h"
 #include "SoundComponent.h"
 #include "UILabel.h"
+#include "HealthComponent.h"
 
 #endif // !COMPONENTS_H
 

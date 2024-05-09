@@ -46,6 +46,7 @@ public:
 	void update() override {
 		this->position.x += this->velocity.x * this->speed;
 		this->position.y += this->velocity.y * this->speed;
+
 	}
 
 };
