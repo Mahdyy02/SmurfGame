@@ -37,8 +37,9 @@ C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(44,
 C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\TileComponent.h(45,39): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
   (compiler le fichier source 'Game.cpp')
   
-C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(132,66): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
-C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(133,66): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(97,44): warning C4305: 'argument' : troncation de 'double' à 'float'
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(149,66): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
+C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(150,66): warning C4244: '=' : conversion de 'float' en 'int', perte possible de données
 C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41): warning C4244: 'argument' : conversion de '_Ty' en 'float', perte possible de données
 C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41): warning C4244:         with
 C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41): warning C4244:         [
@@ -47,7 +48,7 @@ C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41): warni
   (compiler le fichier source 'Game.cpp')
   C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\ECS.h(88,41):
   le contexte d’instanciation du modèle (le plus ancien) est
-  	C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(72,8):
+  	C:\Users\ASUS TUF\Desktop\Study\Projects\SmurfGame\SmurfGame\Game.cpp(83,8):
   	voir la référence à l'instanciation de la fonction modèle 'T &Entity::addComponent<TransformComponent,int,int,int,int,int>(int &&,int &&,int &&,int &&,int &&)' en cours de compilation
           with
           [
