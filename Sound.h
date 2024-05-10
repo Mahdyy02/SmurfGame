@@ -11,7 +11,7 @@ class Sound {
 
 public:
 
-	int channel;
+	bool playing = false;
 
 	Sound(std::string id, float volume);
 	~Sound();
@@ -23,8 +23,8 @@ public:
 	void setVolume(float v);
 
 private:
-	bool playing = false;
 	Mix_Chunk* sound = nullptr;
+	int channel;
 	float volume;
 	static int getNextChannelID();
 

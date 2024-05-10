@@ -8,7 +8,7 @@
 
 extern Manager manager;
 
-Map::Map(std::string tID, int ms, int ts): texID(tID), mapScale(ms), tileSize(ts) {}
+Map::Map(std::string tID, int ms, int ts, int w, int h): texID(tID), mapScale(ms), tileSize(ts), width(w), height(h) {}
 
 Map::~Map() {
 
@@ -46,7 +46,7 @@ void Map::loadMap(std::string path,  int sizeX, int sizeY) {
 			if (c == '1') {
 				auto& label(manager.addEntity());
 				SDL_Color white = { 255,255,255, 255 };
-				label.addComponent<UILabel>(x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale, "Press E to enter", "arial", white, false);
+				label.addComponent<UILabel>(x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale, "Press E to enter", "arial", white, false, 100);
 				label.addGroup(Game::groupLabels);
 			}
 			mapFile.ignore();

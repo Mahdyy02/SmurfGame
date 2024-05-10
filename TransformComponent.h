@@ -17,6 +17,8 @@ public:
 
 	int speed = 2;
 
+	int isNearhouse = false;
+
 	TransformComponent() {
 		this->position.zero();
 	}

@@ -26,7 +26,7 @@ public:
 	void update() override {
 
 		this->timesteps++;
-		if (this->timesteps % 100 == 0) decreaseHP(1);
+		if (this->timesteps % 1000 == 0) decreaseHP(1);
 
 		this->destRect.x = static_cast<int>(this->transform->position.x) - Game::camera.x;
 		this->destRect.y = static_cast<int>(this->transform->position.y) - 30 - Game::camera.y;

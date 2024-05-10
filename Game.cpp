@@ -6,14 +6,14 @@
 #include <sstream>
 #include "Sound.h"
 
-int Game::screenWidth = 1500;
-int Game::screenHeight = 800;
+int Game::screenWidth = 1800;
+int Game::screenHeight = 900;
 
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
 SDL_Event Game::event;
 
-SDL_Rect Game::camera ={0, 0, 8192*1, 4096 *1 };
+SDL_Rect Game::camera;
 
 AssetManager* Game::assets = new AssetManager(&manager);
 
@@ -26,6 +26,7 @@ Map* map;
 Sound* backgroundMusic;
 Sound* bluePotionSound;
 Sound* redPotionSound;
+Sound* hitSound;
 
 bool Game::isRunning = false;
 
@@ -88,11 +89,17 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 
 	assets->addSound("background", "background_music.wav");
 	assets->addSound("walk", "walk.wav");
+	assets->addSound("hit", "hit.wav");
 
 	assets->addSound("redPotionSound", "red_potion.wav");
 	assets->addSound("bluePotionSound", "blue_potion.wav");
 	
-	map = new Map("terrain", 1, 32);
+	map = new Map("terrain", 1, 32, 8192, 4096);
+
+	camera.x = 0;
+	camera.y = 0;
+	camera.w = map->getWidth();
+	camera.h = map->getWidth();
 
 	map->loadMap("map.map", 256, 128);
 
@@ -119,6 +126,7 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 
 	redPotionSound = new Sound("redPotionSound", 1);
 	bluePotionSound = new Sound("bluePotionSound", 1);
+	hitSound = new Sound("hit", 1);
 }
 
 auto& tiles(manager.getGroup(Game::groupMap));
@@ -170,7 +178,9 @@ void Game::update() {
 
 	for (auto& p : projectiles) {
 		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, p->getComponent<ColliderComponent>().collider)) {
-			std::cout << "Collision!" << std::endl;
+			player.getComponent<HealthComponent>().decreaseHP(50);
+			hitSound->play(0);
+			hitSound->playing = false;
 			p->destroy();
 		}
 	}
@@ -179,6 +189,7 @@ void Game::update() {
 		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, r->getComponent<ColliderComponent>().collider)) {
 			player.getComponent<HealthComponent>().increaseHP(30);
 			redPotionSound->play(0);
+			redPotionSound->playing = false;
 			r->destroy();
 		}
 	}
@@ -187,7 +198,20 @@ void Game::update() {
 		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, b->getComponent<ColliderComponent>().collider)) {
 			player.getComponent<HealthComponent>().increaseHP(60);
 			bluePotionSound->play(0);
+			bluePotionSound->playing = false;
 			b->destroy();
+		}
+	}
+
+	for (auto& h : labels) {
+		player.getComponent<TransformComponent>().isNearhouse = h->getComponent<UILabel>().inRange(player.getComponent<TransformComponent>().position);
+		if (player.getComponent<TransformComponent>().isNearhouse){
+			if (Game::event.type == SDL_KEYDOWN) {
+				if (Game::event.key.keysym.sym == SDLK_e) {
+					player.getComponent<TransformComponent>().position.x = 100;
+					player.getComponent<TransformComponent>().position.y = 100;
+				}
+			}
 		}
 	}
 
