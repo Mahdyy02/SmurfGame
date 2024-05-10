@@ -31,6 +31,8 @@ public:
 	Vector2D& zero();
 
 	friend std::ostream& operator<<(std::ostream os, const Vector2D vec);
+
+	Vector2D& normalize();
 };
 
 #endif // !VECTOR2D_H

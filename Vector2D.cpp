@@ -94,3 +94,12 @@ std::ostream& operator<<(std::ostream& os, const Vector2D& vec) {
 	os << "(" << vec.x << "," << vec.y << ")";
 	return os;
 }
+
+Vector2D& Vector2D::normalize() {
+	float magnitude = sqrt(x * x + y * y);
+	if (magnitude != 0.0f) {
+		x /= magnitude;
+		y /= magnitude;
+	}
+	return *this;
+}

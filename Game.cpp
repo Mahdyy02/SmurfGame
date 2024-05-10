@@ -6,8 +6,8 @@
 #include <sstream>
 #include "Sound.h"
 
-int Game::screenWidth = 1800;
-int Game::screenHeight = 900;
+int Game::screenWidth = 1500;
+int Game::screenHeight = 800;
 
 int minX = 0;
 int minY = 0;
@@ -23,6 +23,8 @@ SDL_Rect Game::camera = {0, 0, 8192, 4096 };
 AssetManager* Game::assets = new AssetManager(&manager);
 
 auto& player(manager.addEntity());
+
+auto& bug(manager.addEntity());
 
 auto& label(manager.addEntity());
 auto& labelHP(manager.addEntity());
@@ -116,6 +118,9 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	player.getComponent<SoundComponent>().addSound("walk","walk");
 	player.addGroup(groupPlayers);
 
+	bug.addComponent<TransformComponent>(570, 2200, 32, 32, 3);
+	bug.addComponent<SpriteComponent>("player", true);
+
 	SDL_Color white = { 255,255,255, 255 };
 	SDL_Color black = { 0, 0, 0, 255 };
 	label.addComponent<UILabel>(10, 10, "", "arial", white, true);
@@ -163,6 +168,8 @@ void Game::update() {
 
 	SDL_Rect playerCol = player.getComponent<ColliderComponent>().collider;
 	Vector2D playerPos = player.getComponent<TransformComponent>().position;
+
+	bug.getComponent<TransformComponent>().chase(playerPos);
 
 	std::stringstream ss;
 	ss << "Player position: (" << playerPos.x << ", " << playerPos.y << ")";
@@ -224,7 +231,7 @@ void Game::update() {
 	std::stringstream playerHp; 
 	playerHp << "Player HP: " << player.getComponent<HealthComponent>().getHealth();
 	labelHP.getComponent<UILabel>().setLabelText(std::move(playerHp).str(), "arial");
-
+	
 	for (auto& h : labels) {
 		player.getComponent<TransformComponent>().isNearhouse = h->getComponent<UILabel>().inRange(player.getComponent<TransformComponent>().position);
 		if (player.getComponent<TransformComponent>().isNearhouse) break;
@@ -313,6 +320,8 @@ void Game::render() {
 	for (auto& l : labels) {
 		l->draw();
 	}
+
+	bug.draw();
 
 	label.draw();
 	labelHP.draw();

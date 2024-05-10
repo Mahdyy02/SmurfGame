@@ -51,6 +51,17 @@ public:
 
 	}
 
+	void chase(Vector2D target) {
+		if (sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) <= 750) {
+			Vector2D direction = target - position + Vector2D(32 * this->scale, 0);
+			direction.normalize();
+			velocity = direction;
+		}
+		else {
+			this->velocity.zero();
+		}
+	}
+
 };
 
 #endif // !TransformComponent_H
