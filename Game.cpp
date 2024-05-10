@@ -6,8 +6,8 @@
 #include <sstream>
 #include "Sound.h"
 
-int Game::screenWidth = 1500;
-int Game::screenHeight = 800;
+int Game::screenWidth = 1800;
+int Game::screenHeight = 900;
 
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
@@ -18,7 +18,6 @@ SDL_Rect Game::camera ={0, 0, 8192*1, 4096 *1 };
 AssetManager* Game::assets = new AssetManager(&manager);
 
 auto& player(manager.addEntity());
-auto& health(manager.addEntity());
 
 auto& label(manager.addEntity());
 auto& labelHP(manager.addEntity());
@@ -101,14 +100,10 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
 	player.addComponent<ColliderComponent>("player");
+	player.addComponent<HealthComponent>(100);
 	player.addComponent<SoundComponent>();
 	player.getComponent<SoundComponent>().addSound("walk","walk");
 	player.addGroup(groupPlayers);
-
-	health.addComponent<HealthComponent>(100);
-	health.addComponent<TransformComponent>(470 , 2307 ,16,100,1);
-	health.addComponent<SpriteComponent>("HP100", false);
-	
 
 	SDL_Color white = { 255,255,255, 255 };
 	label.addComponent<UILabel>(10, 10, "SaneferPawPaw", "arial", white, true);
@@ -184,7 +179,7 @@ void Game::update() {
 
 	for (auto& r : redPotions) {
 		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, r->getComponent<ColliderComponent>().collider)) {
-			health.getComponent<HealthComponent>().increaseHP(30);
+			player.getComponent<HealthComponent>().increaseHP(30);
 			redPotionSound->play(0);
 			r->destroy();
 		}
@@ -192,13 +187,11 @@ void Game::update() {
 
 	for (auto& b : bluePotions) {
 		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, b->getComponent<ColliderComponent>().collider)) {
-			health.getComponent<HealthComponent>().increaseHP(60);
+			player.getComponent<HealthComponent>().increaseHP(60);
 			bluePotionSound->play(0);
 			b->destroy();
 		}
 	}
-
-
 
 	camera.x = player.getComponent<TransformComponent>().position.x - Game::screenWidth/2;
 	camera.y = player.getComponent<TransformComponent>().position.y - Game::screenHeight/2;
@@ -209,36 +202,12 @@ void Game::update() {
 	if (camera.x > camera.w - screenWidth) camera.x = camera.w - screenWidth;
 	if (camera.y > camera.h - screenHeight) camera.y = camera.h - screenHeight;
 
-	if (health.getComponent<HealthComponent>().getHealth() == 0) isRunning = false;
+	if (player.getComponent<HealthComponent>().getHealth() == 0) isRunning = false;
 	
 
 	std::stringstream playerHp; 
-	playerHp << "Player HP: " << health.getComponent<HealthComponent>().getHealth();
+	playerHp << "Player HP: " << player.getComponent<HealthComponent>().getHealth();
 	labelHP.getComponent<UILabel>().setLabelText(std::move(playerHp).str(), "arial");
-
-	health.getComponent<TransformComponent>().position.x = playerPos.x;
-	health.getComponent<TransformComponent>().position.y = playerPos.y - 30;
-
-	int hp = health.getComponent<HealthComponent>().getHealth();
-
-	if (hp > 90) {
-		health.getComponent<SpriteComponent>().setTex("HP100");
-	}
-	else if (hp >70 ) {
-		health.getComponent<SpriteComponent>().setTex("HP80");
-	}
-	else if ( hp > 50 ) {
-		health.getComponent<SpriteComponent>().setTex("HP60");
-	}
-	else if ( hp > 30 ) {
-		health.getComponent<SpriteComponent>().setTex("HP40");
-	}
-	else if ( hp > 15 ) {
-		health.getComponent<SpriteComponent>().setTex("HP20");
-	}
-	else if ( hp > 5) {
-		health.getComponent<SpriteComponent>().setTex("HP10");
-	}
 }
 
 void Game::render() {
@@ -265,8 +234,6 @@ void Game::render() {
 
 	label.draw();
 	labelHP.draw();
-
-	health.draw();
 
 	for (auto& r: redPotions)
 	{

@@ -3,6 +3,7 @@
 #include "ECS.h"
 #include "Components.h"
 #include <iostream>
+#include "Game.h"
 
 class HealthComponent : public Component
 {
@@ -12,25 +13,68 @@ public:
 	}
 	~HealthComponent(){}
 
-	void decreaseHP(int amount) {
-		this->health = this->health - amount < 0 ? 0 : this->health - amount ;
-	}
+	void init() override {
+		this->transform = &this->entity->getComponent<TransformComponent>();
 
-	void increaseHP(int amount) {
-		this->health = this->health + amount > 100 ? 100 : this->health + amount ;
-		// Optionally, you can set a maximum HP limit here if needed
+		this->srcRect.x = 0;
+		this->srcRect.y = 0;
+		this->srcRect.w = 500;
+		this->srcRect.h = 80;
+		this->texture = Game::assets->getTexture("HP100");
 	}
 
 	void update() override {
-		cnt++;
-		if (cnt % 100 == 0) decreaseHP(1);
+
+		this->timesteps++;
+		if (this->timesteps % 100 == 0) decreaseHP(1);
+
+		this->destRect.x = static_cast<int>(this->transform->position.x) - Game::camera.x;
+		this->destRect.y = static_cast<int>(this->transform->position.y) - 30 - Game::camera.y;
+
+		this->destRect.w = 100;
+		this->destRect.h = 16;
+
+		if (this->health > 90) {
+			this->texture = Game::assets->getTexture("HP100");
+		}
+		else if (this->health > 70) {
+			this->texture = Game::assets->getTexture("HP80");
+		}
+		else if (this->health > 50) {
+			this->texture = Game::assets->getTexture("HP60");
+		}
+		else if (this->health > 30) {
+			this->texture = Game::assets->getTexture("HP40");
+		}
+		else if (this->health > 15) {
+			this->texture = Game::assets->getTexture("HP20");
+		}
+		else if (this->health > 5) {
+			this->texture = Game::assets->getTexture("HP10");
+		}
+
+	}
+
+	void draw() override{
+		TextureManager::draw(this->texture, this->srcRect, this->destRect, SDL_FLIP_NONE);
+	}
+
+	void decreaseHP(int amount) {
+		this->health = this->health - amount < 0 ? 0 : this->health - amount;
+	}
+
+	void increaseHP(int amount) {
+		this->health = this->health + amount > 100 ? 100 : this->health + amount;
 	}
 
 	int getHealth() { return this->health;}
 
 private:
 	int health;
-	int cnt = 0 ;
+	int timesteps = 0 ;
+	TransformComponent *transform;
+	SDL_Texture* texture;
+	SDL_Rect srcRect, destRect;
 };
 
 
