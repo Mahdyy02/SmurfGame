@@ -47,7 +47,7 @@ public:
 	~SpriteComponent() {}
 
 	void setTex(std::string id) {
-		this->texture = Game::assets->getTexture(id);
+		texture = Game::assets->getTexture(id);
 	}
 
 	void init() override {
@@ -71,8 +71,8 @@ public:
 		this->destRect.x = static_cast<int>(this->transform->position.x) - Game::camera.x;
 		this->destRect.y = static_cast<int>(this->transform->position.y) - Game::camera.y;
 
-		this->destRect.w = this->transform->width * this->transform->scale;
-		this->destRect.h = this->transform->height * this->transform->scale;
+		destRect.w = this->transform->width * this->transform->scale;
+		destRect.h = this->transform->height * this->transform->scale;
 
 	}
 

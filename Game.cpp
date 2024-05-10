@@ -6,8 +6,8 @@
 #include <sstream>
 #include "Sound.h"
 
-int Game::screenWidth = 1800;
-int Game::screenHeight = 900;
+int Game::screenWidth = 1500;
+int Game::screenHeight = 800;
 
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
@@ -113,8 +113,6 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 
 	assets->createProjectile(Vector2D(640, 2400), Vector2D(1,0), 1, 0, "projectile");
 
-	assets->createProjectile(Vector2D(400,2550),Vector2D(0,0),1,0,"redPotion",1);
-	assets->createProjectile(Vector2D(550, 2550), Vector2D(0, 0), 1, 0, "bluePotion", 2);
 
 	backgroundMusic = new Sound("background", 0.1);
 	backgroundMusic->play(-1);

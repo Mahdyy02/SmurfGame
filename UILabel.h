@@ -20,18 +20,6 @@ public:
 
 		this->setLabelText(this->labelText, this->labelFont);
 	}
-
-	UILabel(int xpos, int ypos, std::string text, std::string font, SDL_Color& colour, bool f, float r) : labelText(text), labelFont(font), textColour(colour), fixed(f), radius(r) {
-
-		this->position.x = xpos;
-		this->position.y = ypos;
-
-		this->cameraPosition.x = xpos;
-		this->cameraPosition.y = ypos;
-
-		this->setLabelText(this->labelText, this->labelFont);
-	}
-
 	~UILabel() {}
 
 	void setLabelText(std::string text, std::string font) {
@@ -54,11 +42,6 @@ public:
 		SDL_RenderCopy(Game::renderer, this->labelTexture, nullptr, &cameraPosition);
 	}
 
-	bool inRange(Vector2D vec) {
-		float d = sqrt(pow(vec.x - this->position.x, 2) + pow(vec.y - this->position.y, 2));
-		return d <= this->radius;
-	}
-
 
 private:
 
@@ -69,8 +52,6 @@ private:
 	SDL_Color textColour;
 	SDL_Texture* labelTexture;
 	bool fixed = true;
-	float radius;
-
 };
 
 #endif // !UILABEL_H
