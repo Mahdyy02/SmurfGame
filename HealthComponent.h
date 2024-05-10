@@ -8,6 +8,11 @@
 class HealthComponent : public Component
 {
 public:
+
+	TransformComponent* transform;
+	SDL_Texture* texture;
+	SDL_Rect srcRect, destRect;
+
 	HealthComponent(int hp) {
 		this->health = hp;
 	}
@@ -29,10 +34,10 @@ public:
 		if (this->timesteps % 1000 == 0) decreaseHP(1);
 
 		this->destRect.x = static_cast<int>(this->transform->position.x) - Game::camera.x;
-		this->destRect.y = static_cast<int>(this->transform->position.y) - 30 - Game::camera.y;
+		this->destRect.y = static_cast<int>(this->transform->position.y) - 10 * this->transform->scale - Game::camera.y;
 
-		this->destRect.w = 100;
-		this->destRect.h = 16;
+		this->destRect.w = 34 * this->transform->scale;
+		this->destRect.h = 6 * this->transform->scale;
 
 		if (this->health > 90) {
 			this->texture = Game::assets->getTexture("HP100");
@@ -72,9 +77,6 @@ public:
 private:
 	int health;
 	int timesteps = 0 ;
-	TransformComponent *transform;
-	SDL_Texture* texture;
-	SDL_Rect srcRect, destRect;
 };
 
 

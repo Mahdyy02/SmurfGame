@@ -9,11 +9,16 @@
 int Game::screenWidth = 1800;
 int Game::screenHeight = 900;
 
+int minX = 0;
+int minY = 0;
+int posX = -1;
+int posY = -1;
+
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
 SDL_Event Game::event;
 
-SDL_Rect Game::camera;
+SDL_Rect Game::camera = {0, 0, 8192, 4096 };
 
 AssetManager* Game::assets = new AssetManager(&manager);
 
@@ -21,8 +26,10 @@ auto& player(manager.addEntity());
 
 auto& label(manager.addEntity());
 auto& labelHP(manager.addEntity());
+auto& labelHouse(manager.addEntity());
 
 Map* map;
+
 Sound* backgroundMusic;
 Sound* bluePotionSound;
 Sound* redPotionSound;
@@ -96,12 +103,7 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	
 	map = new Map("terrain", 1, 32, 8192, 4096);
 
-	camera.x = 0;
-	camera.y = 0;
-	camera.w = map->getWidth();
-	camera.h = map->getWidth();
-
-	map->loadMap("map.map", 256, 128);
+	map->loadMap("map.map", 256, 173);
 
 	player.addComponent<TransformComponent>(470,2327,32,32,3);
 	player.addComponent<SpriteComponent>("player", true);
@@ -113,10 +115,13 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	player.addGroup(groupPlayers);
 
 	SDL_Color white = { 255,255,255, 255 };
-	label.addComponent<UILabel>(10, 10, "SaneferPawPaw", "arial", white, true);
+	SDL_Color black = { 0, 0, 0, 255 };
+	label.addComponent<UILabel>(10, 10, "", "arial", white, true);
 	label.addGroup(Game::groupLabels);
 
-	labelHP.addComponent<UILabel>(10, 30, "SaneferPawPaw", "arial", white, true);
+	labelHouse.addComponent<UILabel>(5950, 4880, "Press Y to leave", "arial", black, false, 100);
+
+	labelHP.addComponent<UILabel>(10, 30, "", "arial", white, true);
 
 	assets->createProjectile(Vector2D(640, 2400), Vector2D(1,0), 1, 0, "projectile");
 
@@ -150,8 +155,6 @@ void Game::handleEvents() {
 	}
 
 }
-
-
 
 void Game::update() {
 
@@ -203,24 +206,12 @@ void Game::update() {
 		}
 	}
 
-	for (auto& h : labels) {
-		player.getComponent<TransformComponent>().isNearhouse = h->getComponent<UILabel>().inRange(player.getComponent<TransformComponent>().position);
-		if (player.getComponent<TransformComponent>().isNearhouse){
-			if (Game::event.type == SDL_KEYDOWN) {
-				if (Game::event.key.keysym.sym == SDLK_e) {
-					player.getComponent<TransformComponent>().position.x = 100;
-					player.getComponent<TransformComponent>().position.y = 100;
-				}
-			}
-		}
-	}
-
 	camera.x = player.getComponent<TransformComponent>().position.x - Game::screenWidth/2;
 	camera.y = player.getComponent<TransformComponent>().position.y - Game::screenHeight/2;
 
 
-	if (camera.x < 0) camera.x = 0;
-	if (camera.y < 0) camera.y = 0; 
+	if (camera.x < minX) camera.x = minX;
+	if (camera.y < minY) camera.y = minY; 
 	if (camera.x > camera.w - screenWidth) camera.x = camera.w - screenWidth;
 	if (camera.y > camera.h - screenHeight) camera.y = camera.h - screenHeight;
 
@@ -230,10 +221,70 @@ void Game::update() {
 	std::stringstream playerHp; 
 	playerHp << "Player HP: " << player.getComponent<HealthComponent>().getHealth();
 	labelHP.getComponent<UILabel>().setLabelText(std::move(playerHp).str(), "arial");
+
+	for (auto& h : labels) {
+		player.getComponent<TransformComponent>().isNearhouse = h->getComponent<UILabel>().inRange(player.getComponent<TransformComponent>().position);
+		if (player.getComponent<TransformComponent>().isNearhouse) break;
+	}
+
+	if (player.getComponent<TransformComponent>().isNearhouse) {
+		if (Game::event.type == SDL_KEYDOWN) {
+			if (Game::event.key.keysym.sym == SDLK_e) {
+
+				posX = player.getComponent<TransformComponent>().position.x;
+				posY = player.getComponent<TransformComponent>().position.y;
+
+				minX = 5632;
+				minY = 4096;
+
+				player.getComponent<TransformComponent>().position.x = 6200;
+				player.getComponent<TransformComponent>().position.y = 5000;
+
+				camera.x = player.getComponent<TransformComponent>().position.x - Game::screenWidth / 2;
+				camera.y = player.getComponent<TransformComponent>().position.y - Game::screenHeight / 2;
+
+				Game::camera.w = 8192; 
+				Game::camera.h = 5536; 
+
+				player.getComponent<TransformComponent>().scale = 6;
+			}
+		}
+	}
+
+	if (Game::event.key.keysym.sym == SDLK_y) {
+
+		if (posX != -1 && posY != -1 && labelHouse.getComponent<UILabel>().inRange(player.getComponent<TransformComponent>().position)) {
+
+			minX = 0;
+			minY = 0;
+
+			player.getComponent<TransformComponent>().position.x = posX;
+			player.getComponent<TransformComponent>().position.y = posY;
+
+			Game::camera.x = player.getComponent<TransformComponent>().position.x - (Game::screenWidth / 2);
+			Game::camera.y = player.getComponent<TransformComponent>().position.y - (Game::screenHeight / 2);
+
+			Game::camera.w = 8192; 
+			Game::camera.h = 4096; 
+
+			posX = -1;
+			posY = -1;
+
+			Game::camera = { 0, 0, 8192, 4096 };
+
+			player.getComponent<TransformComponent>().scale = 3;
+
+		}
+	}
 }
 
 void Game::render() {
 	SDL_RenderClear(this->renderer);
+
+	if (camera.x == 0 && camera.y == 0) {
+		camera.x = player.getComponent<TransformComponent>().position.x - Game::screenWidth / 2;
+		camera.y = player.getComponent<TransformComponent>().position.y - Game::screenHeight / 2;
+	}
 
 	for (auto& t : tiles) {
 		t->draw();
@@ -256,6 +307,7 @@ void Game::render() {
 
 	label.draw();
 	labelHP.draw();
+	labelHouse.draw();
 
 	for (auto& r: redPotions)
 	{
