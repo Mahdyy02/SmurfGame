@@ -34,6 +34,7 @@ Sound* backgroundMusic;
 Sound* bluePotionSound;
 Sound* redPotionSound;
 Sound* hitSound;
+Sound* doorSound;
 
 bool Game::isRunning = false;
 
@@ -97,6 +98,7 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	assets->addSound("background", "background_music.wav");
 	assets->addSound("walk", "walk.wav");
 	assets->addSound("hit", "hit.wav");
+	assets->addSound("door", "door.wav");
 
 	assets->addSound("redPotionSound", "red_potion.wav");
 	assets->addSound("bluePotionSound", "blue_potion.wav");
@@ -132,6 +134,7 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	redPotionSound = new Sound("redPotionSound", 1);
 	bluePotionSound = new Sound("bluePotionSound", 1);
 	hitSound = new Sound("hit", 1);
+	doorSound = new Sound("door", 1);
 }
 
 auto& tiles(manager.getGroup(Game::groupMap));
@@ -234,6 +237,9 @@ void Game::update() {
 				posX = player.getComponent<TransformComponent>().position.x;
 				posY = player.getComponent<TransformComponent>().position.y;
 
+				doorSound->play(0);
+				doorSound->playing = false;
+
 				minX = 5632;
 				minY = 4096;
 
@@ -260,6 +266,9 @@ void Game::update() {
 
 			player.getComponent<TransformComponent>().position.x = posX;
 			player.getComponent<TransformComponent>().position.y = posY;
+
+			doorSound->play(0);
+			doorSound->playing = false;
 
 			Game::camera.x = player.getComponent<TransformComponent>().position.x - (Game::screenWidth / 2);
 			Game::camera.y = player.getComponent<TransformComponent>().position.y - (Game::screenHeight / 2);
