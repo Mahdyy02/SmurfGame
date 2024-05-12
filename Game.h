@@ -3,11 +3,11 @@
 
 #include <iostream>
 #include <vector>
-#include "SDL.h"
-#include "SDL_image.h"
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
 #include "TextureManager.h"
 #include "AssetManager.h"
-#include <SDL_mixer.h>
 
 class ColliderComponent;
 class AssetManager;

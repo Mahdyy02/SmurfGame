@@ -67,7 +67,6 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 			SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255);
 			std::cout << "Renderer created..." << std::endl;
 		}
-		isRunning = true;
 	}
 	else {
 		isRunning = false;
@@ -75,12 +74,20 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 
 	if (TTF_Init() == -1) {
 		std::cout << "Error: SDL_TTF" << std::endl;
+		isRunning = false;
 	}
 
 	Mix_Init(MIX_INIT_MP3);
 
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
 		printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+		isRunning = false;
+	}
+
+	int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
+	if (!(IMG_Init(imgFlags) & imgFlags)) {
+		printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+		isRunning = false;
 	}
 
 	assets->addTexture("terrain", "map.png");
@@ -101,6 +108,8 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	assets->addTexture("bluePotion", "blue_potion.png");
 
 	assets->addFont("arial", "arial.ttf", 16);
+	assets->addFont("freeman", "Freeman-Regular.ttf", 40);
+	assets->addFont("skincake", "Skincake.ttf", 56);
 
 	assets->addSound("background", "background_music.wav");
 	assets->addSound("walk", "walk.wav");
@@ -162,11 +171,9 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	hitSound = new Sound("hit", 1);
 	doorSound = new Sound("door", 1);
 
-	//this->SmurfEngineerHouse = rand() % 7;
-	//this->SmurfFemaleHouse = rand() % 7;
-	//while(this->SmurfEngineerHouse == this->SmurfFemaleHouse) this->SmurfFemaleHouse = rand() % 7;
-	this->SmurfEngineerHouse = 6;
-	this->SmurfFemaleHouse = 5;
+	this->SmurfEngineerHouse = rand() % 7;
+	this->SmurfFemaleHouse = rand() % 7;
+	while(this->SmurfEngineerHouse == this->SmurfFemaleHouse) this->SmurfFemaleHouse = rand() % 7;
 
 }
 
