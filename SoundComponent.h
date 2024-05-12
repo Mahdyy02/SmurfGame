@@ -8,9 +8,12 @@
 
 class SoundComponent : public Component {
 public:
+
+    std::map < std::string, Sound*> sounds;
+
 	SoundComponent() = default;
     ~SoundComponent() {
-        sounds.clear();
+        this->sounds.clear();
     }
 
     void update() override {
@@ -26,12 +29,10 @@ public:
     }
 
 	void addSound(std::string id, std::string sound_id) {
-		Sound* s = new Sound(sound_id, 1.0);
+		Sound* s = new Sound(sound_id, 0.5);
 		this->sounds[id] = s;
 	}
 
-private:
-	std::map < std::string, Sound*> sounds;
 };
 
 #endif // !SOUNDCOMPONENT_H

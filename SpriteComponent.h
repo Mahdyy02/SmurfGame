@@ -33,7 +33,7 @@ public:
 		
 		this->animated = isAnimated;
 
-		Animation idle = Animation(0, 3, 100);
+		Animation idle = Animation(0, 3, 200);
 		Animation walk = Animation(1, 8, 100);
 
 		this->animations.emplace("idle", idle);
@@ -73,6 +73,18 @@ public:
 
 		this->destRect.w = this->transform->width * this->transform->scale;
 		this->destRect.h = this->transform->height * this->transform->scale;
+
+		if ((this->transform->velocity.x != 0 || this->transform->velocity.y != 0) && this->animated) {
+			this->play("walk");
+		}
+		else if(this->transform->velocity.x == 0 && this->transform->velocity.y == 0 && this->animated){
+			this->play("idle");
+		}
+
+		if (this->transform->velocity.x > 0) {
+			this->spriteFlip = spriteFlip = SDL_FLIP_NONE;
+		}
+		else this->spriteFlip = SDL_FLIP_HORIZONTAL;
 
 	}
 

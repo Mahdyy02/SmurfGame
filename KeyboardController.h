@@ -33,7 +33,6 @@ public:
                     transform->velocity.x = -2;
                     transform->velocity.y = -1;
                     sprite->play("walk");
-                    sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
                     break;
                 case SDLK_DOWN:
                 case SDLK_s:
@@ -41,7 +40,6 @@ public:
                     transform->velocity.x = -2;
                     transform->velocity.y = 1;
                     sprite->play("walk");
-                    sprite->spriteFlip = SDL_FLIP_HORIZONTAL;
                     break;
                 case SDLK_RIGHT:
                 case SDLK_d:
@@ -74,7 +72,6 @@ public:
                     transform->velocity.x = 0;
                     transform->velocity.y = 0;
                     sprite->play("idle");
-                    sprite->spriteFlip = SDL_FLIP_NONE;
                 }
                 break;
             case SDLK_DOWN:
@@ -84,7 +81,6 @@ public:
                     transform->velocity.x = 0;
                     transform->velocity.y = 0;
                     sprite->play("idle");
-                    sprite->spriteFlip = SDL_FLIP_NONE;
                 }
                 break;
             case SDLK_RIGHT:

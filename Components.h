@@ -11,6 +11,7 @@
 #include "SoundComponent.h"
 #include "UILabel.h"
 #include "HealthComponent.h"
+#include "FindComponent.h"
 
 #endif // !COMPONENTS_H
 

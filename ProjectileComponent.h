@@ -7,19 +7,20 @@
 
 class ProjectileComponent : public Component {
 public:
-	ProjectileComponent(int rng, int sp, Vector2D vel , int isPo):range(rng), speed(sp), velocity(vel) , isPotion(isPo) {}
+	ProjectileComponent(int rng, int sp, Vector2D vel , int isPo): range(rng), speed(sp), velocity(vel) , isPotion(isPo) {}
 	~ProjectileComponent(){}
 
 	void init() override {
 		this->transform = &this->entity->getComponent<TransformComponent>();
 		this->transform->velocity = this->velocity;
+		this->transform->speed = 3;
 	}
 
 	void update() override {
 
 		distance += speed;
 
-		if (this->distance > this->range) {
+		/*if (this->distance > this->range) {
 			std::cout << "Out of range!" << std::endl;
 			this->entity->destroy();
 		}
@@ -30,7 +31,7 @@ public:
 		{
 			std::cout << "Out of bounds!" << std::endl;
 			this->entity->destroy();
-		}
+		}*/
 	}
 
 private:

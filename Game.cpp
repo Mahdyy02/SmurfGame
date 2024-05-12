@@ -5,14 +5,17 @@
 #include "Collision.h"
 #include <sstream>
 #include "Sound.h"
+#include <math.h>
+#include <cstdlib>
+#include <ctime>
 
-int Game::screenWidth = 1500;
-int Game::screenHeight = 800;
+int playerNearHouseID = -1;
+
+int Game::screenWidth = 1800;
+int Game::screenHeight = 900;
 
 int minX = 0;
 int minY = 0;
-int posX = -1;
-int posY = -1;
 
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
@@ -23,8 +26,8 @@ SDL_Rect Game::camera = {0, 0, 8192, 4096 };
 AssetManager* Game::assets = new AssetManager(&manager);
 
 auto& player(manager.addEntity());
-
-auto& bug(manager.addEntity());
+auto& smurfEngineer(manager.addEntity());
+auto& smurfFemale(manager.addEntity());
 
 auto& label(manager.addEntity());
 auto& labelHP(manager.addEntity());
@@ -82,6 +85,8 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 
 	assets->addTexture("terrain", "map.png");
 	assets->addTexture("player", "animated_smurf.png");
+	assets->addTexture("smurfEngineer", "animated_engineer_smurf.png");
+	assets->addTexture("smurfFemale", "animated_female_smurf.png");
 	assets->addTexture("projectile", "charchabil.png");
 	assets->addTexture("collider", "empty.png");
 
@@ -118,8 +123,19 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	player.getComponent<SoundComponent>().addSound("walk","walk");
 	player.addGroup(groupPlayers);
 
-	bug.addComponent<TransformComponent>(570, 2200, 32, 32, 3);
-	bug.addComponent<SpriteComponent>("player", true);
+	smurfEngineer.addComponent<TransformComponent>(100000, 100000, 32, 32, 3);
+	smurfEngineer.getComponent<TransformComponent>().speed = 4;
+	smurfEngineer.addComponent<SpriteComponent>("smurfEngineer", true);
+	smurfEngineer.addComponent<ColliderComponent>("smurfEngineer");
+	smurfEngineer.addComponent<FindComponent>();
+	smurfEngineer.addGroup(groupPlayers);
+
+	smurfFemale.addComponent<TransformComponent>(100000, 100000, 32, 32, 3);
+	smurfFemale.getComponent<TransformComponent>().speed = 4;
+	smurfFemale.addComponent<SpriteComponent>("smurfFemale", true);
+	smurfFemale.addComponent<ColliderComponent>("smurfFemale");
+	smurfFemale.addComponent<FindComponent>();
+	smurfFemale.addGroup(groupPlayers);
 
 	SDL_Color white = { 255,255,255, 255 };
 	SDL_Color black = { 0, 0, 0, 255 };
@@ -130,8 +146,13 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 
 	labelHP.addComponent<UILabel>(10, 30, "", "arial", white, true);
 
-	assets->createProjectile(Vector2D(640, 2400), Vector2D(1,0), 1, 0, "projectile");
-
+	assets->createProjectile(Vector2D(840, 2400), Vector2D(0,0), 1, 0, "projectile");
+	assets->createProjectile(Vector2D(2400, 2400), Vector2D(0, 0), 1, 0, "projectile");
+	assets->createProjectile(Vector2D(640, 200), Vector2D(0, 0), 1, 0, "projectile");
+	assets->createProjectile(Vector2D(640, 600), Vector2D(0, 0), 1, 0, "projectile");
+	assets->createProjectile(Vector2D(4000, 4000), Vector2D(0, 0), 1, 0, "projectile");
+	assets->createProjectile(Vector2D(4800, 560), Vector2D(0, 0), 1, 0, "projectile");
+	assets->createProjectile(Vector2D(4800, 800), Vector2D(0, 0), 1, 0, "projectile");
 
 	backgroundMusic = new Sound("background", 0.1);
 	backgroundMusic->play(-1);
@@ -140,6 +161,13 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	bluePotionSound = new Sound("bluePotionSound", 1);
 	hitSound = new Sound("hit", 1);
 	doorSound = new Sound("door", 1);
+
+	//this->SmurfEngineerHouse = rand() % 7;
+	//this->SmurfFemaleHouse = rand() % 7;
+	//while(this->SmurfEngineerHouse == this->SmurfFemaleHouse) this->SmurfFemaleHouse = rand() % 7;
+	this->SmurfEngineerHouse = 6;
+	this->SmurfFemaleHouse = 5;
+
 }
 
 auto& tiles(manager.getGroup(Game::groupMap));
@@ -169,13 +197,20 @@ void Game::update() {
 	SDL_Rect playerCol = player.getComponent<ColliderComponent>().collider;
 	Vector2D playerPos = player.getComponent<TransformComponent>().position;
 
-	bug.getComponent<TransformComponent>().chase(playerPos);
+	SDL_Rect smurfEngineerCol = smurfEngineer.getComponent<ColliderComponent>().collider;
+	Vector2D smurfEngineerPos = smurfEngineer.getComponent<TransformComponent>().position;
+
+	SDL_Rect smurfFemaleCol = smurfFemale.getComponent<ColliderComponent>().collider;
+	Vector2D smurfFemalePos = smurfFemale.getComponent<TransformComponent>().position;
+
+	smurfEngineer.getComponent<TransformComponent>().chase(playerPos);
+	if(smurfFemale.getComponent<FindComponent>().isSpawnedInMainMap()) smurfFemale.getComponent<TransformComponent>().chase(smurfEngineerPos);
+	else smurfFemale.getComponent<TransformComponent>().chase(playerPos);
 
 	std::stringstream ss;
 	ss << "Player position: (" << playerPos.x << ", " << playerPos.y << ")";
 	label.getComponent<UILabel>().setLabelText(std::move(ss).str(), "arial");
 
-	
 	manager.refresh();
 	manager.update();
 
@@ -183,24 +218,52 @@ void Game::update() {
 
 		SDL_Rect cCol = c->getComponent<ColliderComponent>().collider;
 
-		Collision::AABB(cCol, playerCol);
 		if(Collision::AABB(cCol, playerCol)) {
 			player.getComponent<TransformComponent>().position = playerPos;
+			player.getComponent<SpriteComponent>().play("idle");
+			player.getComponent<SoundComponent>().sounds["walk"]->stop();
+		}
+	}
+
+	for (auto& c : colliders) {
+
+		SDL_Rect cCol = c->getComponent<ColliderComponent>().collider;
+
+		if (Collision::AABB(cCol, smurfEngineerCol)) {
+			smurfEngineer.getComponent<TransformComponent>().position = smurfEngineerPos;
+			smurfEngineer.getComponent<SpriteComponent>().play("idle");
+		}
+	}
+
+	for (auto& c : colliders) {
+
+		SDL_Rect cCol = c->getComponent<ColliderComponent>().collider;
+
+		if (Collision::AABB(cCol, smurfFemaleCol)) {
+			smurfFemale.getComponent<TransformComponent>().position = smurfFemalePos;
+			smurfFemale.getComponent<SpriteComponent>().play("idle");
 		}
 	}
 
 	for (auto& p : projectiles) {
-		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, p->getComponent<ColliderComponent>().collider)) {
-			player.getComponent<HealthComponent>().decreaseHP(50);
-			hitSound->play(0);
-			hitSound->playing = false;
-			p->destroy();
+		p->getComponent<TransformComponent>().chase(playerPos);
+		for (auto& pl : players)
+		{
+			if (Collision::AABB(pl->getComponent<ColliderComponent>().collider, p->getComponent<ColliderComponent>().collider)) {
+				pl->getComponent<HealthComponent>().decreaseHP(30);
+				hitSound->play(0);
+				hitSound->playing = false;
+				p->destroy();
+			}
 		}
 	}
 
 	for (auto& r : redPotions) {
 		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, r->getComponent<ColliderComponent>().collider)) {
-			player.getComponent<HealthComponent>().increaseHP(30);
+
+			for (auto& pl : players) {
+				if(pl->hasComponent<HealthComponent>()) pl->getComponent<HealthComponent>().increaseHP(30);
+			}
 			redPotionSound->play(0);
 			redPotionSound->playing = false;
 			r->destroy();
@@ -231,18 +294,21 @@ void Game::update() {
 	std::stringstream playerHp; 
 	playerHp << "Player HP: " << player.getComponent<HealthComponent>().getHealth();
 	labelHP.getComponent<UILabel>().setLabelText(std::move(playerHp).str(), "arial");
-	
-	for (auto& h : labels) {
-		player.getComponent<TransformComponent>().isNearhouse = h->getComponent<UILabel>().inRange(player.getComponent<TransformComponent>().position);
-		if (player.getComponent<TransformComponent>().isNearhouse) break;
+
+	for (auto& l : labels) {
+		player.getComponent<TransformComponent>().isNearhouse = l->getComponent<UILabel>().inRange(player.getComponent<TransformComponent>().position);
+		if (player.getComponent<TransformComponent>().isNearhouse) {
+			playerNearHouseID = l->getComponent<UILabel>().labelID/2;
+			break;
+		} 
 	}
 
 	if (player.getComponent<TransformComponent>().isNearhouse) {
 		if (Game::event.type == SDL_KEYDOWN) {
 			if (Game::event.key.keysym.sym == SDLK_e) {
 
-				posX = player.getComponent<TransformComponent>().position.x;
-				posY = player.getComponent<TransformComponent>().position.y;
+				player.getComponent<TransformComponent>().previousPosition.x = player.getComponent<TransformComponent>().position.x;
+				player.getComponent<TransformComponent>().previousPosition.y = player.getComponent<TransformComponent>().position.y;
 
 				doorSound->play(0);
 				doorSound->playing = false;
@@ -260,19 +326,37 @@ void Game::update() {
 				Game::camera.h = 5536; 
 
 				player.getComponent<TransformComponent>().scale = 6;
+				smurfEngineer.getComponent<TransformComponent>().scale = 6;
+				smurfFemale.getComponent<TransformComponent>().scale = 6;
+
+				if (playerNearHouseID == this->SmurfEngineerHouse && !smurfEngineer.getComponent<FindComponent>().isFound()) {
+					smurfEngineer.getComponent<FindComponent>().find();
+					smurfEngineer.getComponent<FindComponent>().spawnInsideHouse();
+					smurfEngineer.addComponent<HealthComponent>(100);
+				}
+
+				if (playerNearHouseID == this->SmurfFemaleHouse && 
+					smurfEngineer.getComponent<FindComponent>().isFound() &&
+					!smurfFemale.getComponent<FindComponent>().isFound()) 
+				{
+					smurfFemale.getComponent<FindComponent>().find();
+					smurfFemale.getComponent<FindComponent>().spawnInsideHouse();
+					smurfFemale.addComponent<HealthComponent>(100);
+				}
 			}
 		}
 	}
 
 	if (Game::event.key.keysym.sym == SDLK_y) {
 
-		if (posX != -1 && posY != -1 && labelHouse.getComponent<UILabel>().inRange(player.getComponent<TransformComponent>().position)) {
+		if (player.getComponent<TransformComponent>().previousPosition.x != -1 &&
+			player.getComponent<TransformComponent>().previousPosition.y != -1 &&
+			labelHouse.getComponent<UILabel>().inRange(player.getComponent<TransformComponent>().position)) {
 
 			minX = 0;
 			minY = 0;
 
-			player.getComponent<TransformComponent>().position.x = posX;
-			player.getComponent<TransformComponent>().position.y = posY;
+			player.getComponent<TransformComponent>().position = player.getComponent<TransformComponent>().previousPosition;
 
 			doorSound->play(0);
 			doorSound->playing = false;
@@ -283,30 +367,74 @@ void Game::update() {
 			Game::camera.w = 8192; 
 			Game::camera.h = 4096; 
 
-			posX = -1;
-			posY = -1;
+			player.getComponent<TransformComponent>().previousPosition.x = -1;
+			player.getComponent<TransformComponent>().previousPosition.y = -1;
 
 			Game::camera = { 0, 0, 8192, 4096 };
 
 			player.getComponent<TransformComponent>().scale = 3;
+			smurfEngineer.getComponent<TransformComponent>().scale = 3;
+			smurfFemale.getComponent<TransformComponent>().scale = 3;
 
+			if (smurfEngineer.getComponent<FindComponent>().isFound() &&
+				!smurfEngineer.getComponent<FindComponent>().isSpawnedInMainMap()) 
+			{
+				if (playerNearHouseID == 6) {
+					smurfEngineer.getComponent<TransformComponent>().position = Vector2D(4614, 2985);
+					smurfEngineer.getComponent<FindComponent>().setSpawnedInMap();
+				}
+		
+				else if (playerNearHouseID == 5) {
+					smurfEngineer.getComponent<TransformComponent>().position = Vector2D(6700, 2600);
+					smurfEngineer.getComponent<FindComponent>().setSpawnedInMap();
+				}
+				else 
+					smurfEngineer.getComponent<FindComponent>().spawnInMainMap(player.getComponent<TransformComponent>().position);
+			}
+
+			if (smurfFemale.getComponent<FindComponent>().isFound() &&
+				smurfEngineer.getComponent<FindComponent>().isSpawnedInMainMap() &&
+				!smurfFemale.getComponent<FindComponent>().isSpawnedInMainMap()) 
+			{
+				if (playerNearHouseID == 6) {
+					smurfFemale.getComponent<TransformComponent>().position = Vector2D(4614, 2985);
+					smurfFemale.getComponent<FindComponent>().setSpawnedInMap();
+				}
+				else if (playerNearHouseID == 5) {
+					smurfFemale.getComponent<TransformComponent>().position = Vector2D(6700, 2600);
+					smurfFemale.getComponent<FindComponent>().setSpawnedInMap();
+				}
+				else
+					smurfFemale.getComponent<FindComponent>().spawnInMainMap(player.getComponent<TransformComponent>().position);
+			}
 		}
 	}
+
+	bool win = true;
+	for (auto& pl : players) {
+		win *= sqrt(pow(pl->getComponent<TransformComponent>().position.x - 8050, 2) + pow(pl->getComponent<TransformComponent>().position.y - 70, 2)) <= 200;
+	}
+	if (win) this->isRunning = false;
 }
 
 void Game::render() {
 	SDL_RenderClear(this->renderer);
 
 	if (camera.x == 0 && camera.y == 0) {
-		camera.x = player.getComponent<TransformComponent>().position.x - Game::screenWidth / 2;
-		camera.y = player.getComponent<TransformComponent>().position.y - Game::screenHeight / 2;
+		camera.x = std::max((int)player.getComponent<TransformComponent>().position.x - Game::screenWidth / 2, minX);
+		camera.y = std::max((int)player.getComponent<TransformComponent>().position.y - Game::screenHeight / 2, minY);
 	}
 
 	for (auto& t : tiles) {
 		t->draw();
 	}
 	for (auto& p : players) {
-		p->draw();
+		if(!p->hasComponent<FindComponent>())
+			p->draw();
+		else {
+			if(p->getComponent<FindComponent>().isFound())
+				p->draw();
+		}
 	}
 
 	for (auto& c : colliders) {
@@ -320,8 +448,6 @@ void Game::render() {
 	for (auto& l : labels) {
 		l->draw();
 	}
-
-	bug.draw();
 
 	label.draw();
 	labelHP.draw();

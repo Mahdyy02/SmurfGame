@@ -10,12 +10,13 @@ public:
 	
 	Vector2D position;
 	Vector2D velocity;
+	Vector2D previousPosition = Vector2D(-1, -1);
 
 	int height = 32;
 	int width = 32;
 	int scale = 1;
 
-	int speed = 5;
+	int speed = 2;
 
 	int isNearhouse = false;
 
@@ -52,10 +53,11 @@ public:
 	}
 
 	void chase(Vector2D target) {
-		if (sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) <= 750) {
-			Vector2D direction = target - position + Vector2D(32 * this->scale, 0);
+		if (sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) <= 750 &&
+			sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) >= 32*this->scale) {
+			Vector2D direction = target - this->position + Vector2D(-32 * this->scale, 0);
 			direction.normalize();
-			velocity = direction;
+			this->velocity = direction;
 		}
 		else {
 			this->velocity.zero();

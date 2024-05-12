@@ -10,7 +10,12 @@
 
 class UILabel : public Component {
 public:
+
+	int labelID;
+
 	UILabel(int xpos, int ypos, std::string text, std::string font, SDL_Color& colour, bool f) : labelText(text), labelFont(font), textColour(colour), fixed(f) {
+
+		this->labelID = getLabelID();
 
 		this->position.x = xpos;
 		this->position.y = ypos;
@@ -22,6 +27,8 @@ public:
 	}
 
 	UILabel(int xpos, int ypos, std::string text, std::string font, SDL_Color& colour, bool f, float r) : labelText(text), labelFont(font), textColour(colour), fixed(f), radius(r) {
+
+		this->labelID = getLabelID();
 
 		this->position.x = xpos;
 		this->position.y = ypos;
@@ -59,7 +66,6 @@ public:
 		return d <= this->radius;
 	}
 
-
 private:
 
 	SDL_Rect position;
@@ -70,6 +76,11 @@ private:
 	SDL_Texture* labelTexture;
 	bool fixed = true;
 	float radius;
+
+	int getLabelID() {
+		static int firstID = 0;
+		return firstID++;
+	}
 
 };
 

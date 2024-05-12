@@ -46,6 +46,9 @@ public:
 		groupeBluePotions
 	};
 
+	int SmurfEngineerHouse;
+	int SmurfFemaleHouse;
+
 private:
 
 	SDL_Window* window;
