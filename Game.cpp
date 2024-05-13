@@ -11,8 +11,9 @@
 
 int playerNearHouseID = -1;
 
-int Game::screenWidth = 1800;
-int Game::screenHeight = 900;
+int Game::screenWidth = 1500;
+int Game::screenHeight = 800;
+int Game::gameLevel = 1;
 
 int minX = 0;
 int minY = 0;
@@ -49,6 +50,7 @@ Game::Game() {}
 Game::~Game() {}
 
 void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
+
 	int flags = 0;
 	if (fullscreen) {
 		flags = SDL_WINDOW_FULLSCREEN;
@@ -253,7 +255,7 @@ void Game::update() {
 	}
 
 	for (auto& p : projectiles) {
-		p->getComponent<TransformComponent>().chase(playerPos);
+		p->getComponent<TransformComponent>().chase(playerPos,Game::gameLevel);
 		for (auto& pl : players)
 		{
 			if (Collision::AABB(pl->getComponent<ColliderComponent>().collider, p->getComponent<ColliderComponent>().collider)) {

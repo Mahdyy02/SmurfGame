@@ -54,10 +54,41 @@ public:
 
 	void chase(Vector2D target) {
 		if (sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) <= 750 &&
-			sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) >= 32*this->scale) {
+			sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) >= 32 * this->scale) {
 			Vector2D direction = target - this->position + Vector2D(-32 * this->scale, 0);
 			direction.normalize();
 			this->velocity = direction;
+		}
+		else {
+			this->velocity.zero();
+		}
+	}
+
+	void chase(Vector2D target , int velocityLevel) {
+		if (sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) <= 750 &&
+			sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) >= 32*this->scale) {
+			Vector2D direction = target - this->position + Vector2D(-32 * this->scale, 0);
+			direction.normalize();
+			this->velocity = direction ;
+
+			int velocityMultipl = 1;
+
+			switch (velocityLevel)
+			{
+			case 0 :
+				velocityMultipl = 0;
+				break;
+			case 1 : 
+				velocityMultipl = 1;
+				break;
+			case 2 : 
+				velocityMultipl = 2;
+				break;
+			default:
+				break;
+			}
+
+			this->velocity * velocityMultipl;
 		}
 		else {
 			this->velocity.zero();

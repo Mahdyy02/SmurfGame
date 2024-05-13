@@ -34,6 +34,7 @@ public:
 
 	static int screenHeight;
 	static int screenWidth;
+	static int gameLevel;
 
 	enum groupLabels : std::size_t {
 		groupMap,
