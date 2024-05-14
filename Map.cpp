@@ -16,7 +16,7 @@ Map::~Map() {
 
 }
 
-void Map::loadMap(std::string path,  int sizeX, int sizeY) {
+void Map::loadMap(std::string path,  int sizeX, int sizeY, bool reset) {
 
 	std::fstream mapFile;
 	mapFile.open(path);
@@ -24,7 +24,7 @@ void Map::loadMap(std::string path,  int sizeX, int sizeY) {
 
 	for (int y = 0; y < sizeY; ++y) {
 		for (int x = 0; x < sizeX; ++x) {
-			addTile(x * this->tileSize, y * this->tileSize, x * this->tileSize*this->mapScale, y * this->tileSize * this->mapScale);
+			if(!reset) addTile(x * this->tileSize, y * this->tileSize, x * this->tileSize*this->mapScale, y * this->tileSize * this->mapScale);
 		}
 	}
 
@@ -32,9 +32,11 @@ void Map::loadMap(std::string path,  int sizeX, int sizeY) {
 		for (int x = 0; x < sizeX; ++x) {
 			mapFile.get(c);
 			if (c == '1') {
-				auto& tcol(manager.addEntity());
-				tcol.addComponent<ColliderComponent>("terrain", x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale, this->tileSize * this->mapScale);
-				tcol.addGroup(Game::groupColliders);
+				if (!reset) {
+					auto& tcol(manager.addEntity());
+					tcol.addComponent<ColliderComponent>("terrain", x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale, this->tileSize * this->mapScale);
+					tcol.addGroup(Game::groupColliders);
+				}
 			}
 			mapFile.ignore();
 		}
@@ -46,13 +48,15 @@ void Map::loadMap(std::string path,  int sizeX, int sizeY) {
 		for (int x = 0; x < sizeX; ++x) {
 			mapFile.get(c);
 			if (c == '1') {
-				auto& label(manager.addEntity());
-				auto& labelIndex(manager.addEntity());
-				SDL_Color white = { 255,255,255, 255 };
-				label.addComponent<UILabel>(x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale, "Press E to enter", "arial", white, false, 100);
-				labelIndex.addComponent<UILabel>(x * this->tileSize * this->mapScale + 20, y * this->tileSize * this->mapScale + 20, "House: " + std::to_string(label.getComponent<UILabel>().labelID/2), "arial", white, false, 100);
-				label.addGroup(Game::groupLabels);
-				labelIndex.addGroup(Game::groupLabels);
+				if (!reset) {
+					auto& label(manager.addEntity());
+					auto& labelIndex(manager.addEntity());
+					SDL_Color white = { 255,255,255, 255 };
+					label.addComponent<UILabel>(x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale, "Press E to enter", "arial", white, false, 100);
+					labelIndex.addComponent<UILabel>(x * this->tileSize * this->mapScale + 20, y * this->tileSize * this->mapScale + 20, "House: " + std::to_string(label.getComponent<UILabel>().labelID / 2), "arial", white, false, 100);
+					label.addGroup(Game::groupLabels);
+					labelIndex.addGroup(Game::groupLabels);
+				}
 			}
 			mapFile.ignore();
 		}

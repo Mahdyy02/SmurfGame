@@ -29,6 +29,11 @@ public:
 		}
 	}
 
+	void reset() {
+		this->found = false;
+		this->spawnedInMainMap = false;
+	}
+
 	bool isFound() const { return this->found; }
 	bool isSpawnedInMainMap() const { return this->spawnedInMainMap; }
 

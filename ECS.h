@@ -98,6 +98,22 @@ public:
     }
 
     template <typename T>
+    void delComponent() {
+        auto typeId = getComponentTypeID<T>();
+        if (componentBitSet[typeId]) {
+            componentBitSet[typeId] = false;
+            componentArray[typeId] = nullptr;
+
+            for (auto it = components.begin(); it != components.end(); ++it) {
+                if ((*it) && typeid(*(*it)) == typeid(T)) {
+                    components.erase(it);
+                    break;
+                }
+            }
+        }
+    }
+
+    template <typename T>
     T& getComponent() const {
         auto ptr = componentArray[getComponentTypeID<T>()];
         return *static_cast<T*>(ptr);

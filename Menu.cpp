@@ -14,8 +14,8 @@ Menu::~Menu() {
 	TTF_CloseFont(this->font);
 }
 
-void Menu::renderText(const char* text, std::string font_id, int x, int y) {
-    SDL_Color textColor = { 255, 255, 255 };
+void Menu::renderText(const char* text, std::string font_id, int x, int y, int r, int g, int b) {
+    SDL_Color textColor = { r, g, b };
     SDL_Surface* textSurface = TTF_RenderText_Blended(Game::assets->getFont(font_id), text, textColor);
     SDL_Texture* textTexture = SDL_CreateTextureFromSurface(Game::renderer, textSurface);
 
@@ -34,14 +34,15 @@ void Menu::menuLoop() {
     this->running = true;
     bool inLevelSelection = false;
 
-    while (this->running)
-    {
+
+    while (this->running) {
         while (this->running && !inLevelSelection) {
             SDL_Event event;
             while (SDL_PollEvent(&event)) {
                 if (event.type == SDL_QUIT) {
                     this->running = false;
                     Game::isRunning = false;
+                    Game::windowRunning = false;
                 }
                 else if (event.type == SDL_KEYDOWN) {
                     switch (event.key.keysym.sym) {
@@ -58,12 +59,12 @@ void Menu::menuLoop() {
                             this->running = false;
                             break;
                         case 1:
-                            printf("Levels button clicked!\n");
                             inLevelSelection = true;
                             break;
                         case 2:
                             this->running = false;
                             Game::isRunning = false;
+                            Game::windowRunning;
                             break;
                         }
                         break;
@@ -99,12 +100,12 @@ void Menu::menuLoop() {
                             this->running = false;
                         }
                         else if (mouseY >= (Game::screenHeight / 2 + 50) && mouseY <= (Game::screenHeight / 2 + 150)) {
-                            printf("Levels button clicked!\n");
                             inLevelSelection = true;
                         }
                         else if (mouseY >= (Game::screenHeight / 2 + 150) && mouseY <= (Game::screenHeight / 2 + 250)) {
                             this->running = false;
                             Game::isRunning = false;
+                            Game::windowRunning = false;
                         }
                     }
                 }
@@ -117,6 +118,12 @@ void Menu::menuLoop() {
             const char* firstButtonText = Game::isRunning ? "Resume" : "Play";
 
             renderText("SANFOURA", "skincake", Game::screenWidth / 2, 75);
+
+            if (Game::gamesPlayed) {
+                if (Game::win) renderText("Winner Winner! Chicken dinner...!", "freeman", Game::screenWidth / 2, 125, 254, 238, 155);
+                else renderText("You lost...", "freeman", Game::screenWidth / 2, 125, 179, 92, 89);
+            }
+
             renderText(firstButtonText, "freeman", Game::screenWidth / 2, Game::screenHeight / 2 - 25);
             renderText("Levels", "freeman", Game::screenWidth / 2, Game::screenHeight / 2 + 75);
             renderText("Quit", "freeman", Game::screenWidth / 2, Game::screenHeight / 2 + 175);
@@ -147,33 +154,20 @@ void Menu::menuLoop() {
                 if (event.type == SDL_QUIT) {
                     this->running = false;
                     Game::isRunning = false;
+                    inLevelSelection = false;
+                    Game::windowRunning = false;
                 }
                 else if (event.type == SDL_KEYDOWN) {
                     switch (event.key.keysym.sym) {
-                    case SDLK_UP:
-                        this->selectedButton = (this->selectedButton - 1 + 3) % 3;
-                        break;
-                    case SDLK_DOWN:
-                        this->selectedButton = (this->selectedButton + 1) % 3;
-                        break;
-                    case SDLK_RETURN:
-                        switch (this->selectedButton) {
-                        case 0:
-                            printf("Easy mode selected!\n");
+                        case SDLK_UP:
+                            this->selectedButton = (this->selectedButton - 1 + 3) % 3;
+                            break;
+                        case SDLK_DOWN:
+                            this->selectedButton = (this->selectedButton + 1) % 3;
+                            break;
+                        case SDLK_RETURN:
                             inLevelSelection = false;
                             break;
-                        case 1:
-                            printf("Levels button clicked!\n");
-                            inLevelSelection = true;
-                            break;
-                        case 2:
-                            printf("Hard mode selected!\n");
-                            inLevelSelection = false;
-                            break;
-                        }
-                        break;
-                    default:
-                        break;
                     }
                 }
                 else if (event.type == SDL_MOUSEMOTION) {
@@ -201,17 +195,14 @@ void Menu::menuLoop() {
                     if (mouseX >= (Game::screenWidth / 2 - 100) && mouseX <= (Game::screenWidth / 2 + 100)) {
                         if (mouseY >= (Game::screenHeight / 2 - 50) && mouseY <= (Game::screenHeight / 2 + 50)) {
                             Game::gameLevel = 0;
-                            printf("Easy mode selected!\n");
                             inLevelSelection = false;
                         }
                         else if (mouseY >= (Game::screenHeight / 2 + 50) && mouseY <= (Game::screenHeight / 2 + 150)) {
                             Game::gameLevel = 1;
-                            printf("Medium mode selected!\n");
                             inLevelSelection = false;
                         }
                         else if (mouseY >= (Game::screenHeight / 2 + 150) && mouseY <= (Game::screenHeight / 2 + 250)) {
                             Game::gameLevel = 2;
-                            printf("Hard mode selected!\n");
                             inLevelSelection = false;
                         }
                     }
@@ -247,4 +238,5 @@ void Menu::menuLoop() {
 
         }
     }
+
 }

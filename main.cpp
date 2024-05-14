@@ -9,19 +9,24 @@ int frameTime;
 int main(int argc, char* argv[]) {
 
 	game = new Game();
-	game->init("SaneferPawPaw", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0);
+	game->init("Sanfoura", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0);
 
 	menu = new Menu();
-	menu->menuLoop();
 
-	while (game->running()) {
+	while (Game::windowRunning) {
 
-		frameStart = SDL_GetTicks();
+		game->reset();
+		menu->menuLoop();
 
-		game->handleEvents();
+		Game::gamesPlayed = false;
+		while (game->running()) {
 
-        if (Game::event.type == SDL_KEYUP) {
-            switch (Game::event.key.keysym.sym) {
+			frameStart = SDL_GetTicks();
+
+			game->handleEvents();
+
+			if (Game::event.type == SDL_KEYUP) {
+				switch (Game::event.key.keysym.sym) {
 
 				case SDLK_ESCAPE:
 					menu->menuLoop();
@@ -29,16 +34,18 @@ int main(int argc, char* argv[]) {
 				default:
 					break;
 				}
-        }
+			}
 
-		game->update();
-		game->render();
+			game->update();
+			game->render();
 
-		frameTime = SDL_GetTicks() - frameStart;
+			frameTime = SDL_GetTicks() - frameStart;
 
-		if (FrameDelay > frameTime) {
-			SDL_Delay(FrameDelay - frameTime);
+			if (FrameDelay > frameTime) {
+				SDL_Delay(FrameDelay - frameTime);
+			}
 		}
+		Game::gamesPlayed = true;
 	}
 
 	game->clean();

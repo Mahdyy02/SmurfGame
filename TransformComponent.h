@@ -4,6 +4,7 @@
 #include "Components.h"
 #include "Vector2D.h"
 #include <math.h>
+#include "Game.h"
 
 class TransformComponent : public Component {
 public:
@@ -46,6 +47,12 @@ public:
 		this->velocity.zero();
 	}
 
+	void reset(float x, float y) {
+		this->velocity.zero();
+		this->position.x = x;
+		this->position.y = y;
+	}
+
 	void update() override {
 		this->position.x += this->velocity.x * this->speed;
 		this->position.y += this->velocity.y * this->speed;
@@ -54,41 +61,10 @@ public:
 
 	void chase(Vector2D target) {
 		if (sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) <= 750 &&
-			sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) >= 32 * this->scale) {
-			Vector2D direction = target - this->position + Vector2D(-32 * this->scale, 0);
-			direction.normalize();
-			this->velocity = direction;
-		}
-		else {
-			this->velocity.zero();
-		}
-	}
-
-	void chase(Vector2D target , int velocityLevel) {
-		if (sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) <= 750 &&
 			sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) >= 32*this->scale) {
 			Vector2D direction = target - this->position + Vector2D(-32 * this->scale, 0);
 			direction.normalize();
-			this->velocity = direction ;
-
-			int velocityMultipl = 1;
-
-			switch (velocityLevel)
-			{
-			case 0 :
-				velocityMultipl = 0;
-				break;
-			case 1 : 
-				velocityMultipl = 1;
-				break;
-			case 2 : 
-				velocityMultipl = 2;
-				break;
-			default:
-				break;
-			}
-
-			this->velocity * velocityMultipl;
+			this->velocity = direction*Game::levelSpeeds[Game::gameLevel];
 		}
 		else {
 			this->velocity.zero();

@@ -1,22 +1,28 @@
-#include "Game.h"
-#include "Map.h"
-#include "Components.h"
-#include "Vector2D.h"
-#include "Collision.h"
 #include <sstream>
 #include "Sound.h"
 #include <math.h>
 #include <cstdlib>
 #include <ctime>
 
-int playerNearHouseID = -1;
+#include "Game.h"
+#include "Map.h"
+#include "Components.h"
+#include "Vector2D.h"
+#include "Collision.h"
 
-int Game::screenWidth = 1500;
-int Game::screenHeight = 800;
-int Game::gameLevel = 1;
+int Game::screenWidth = 1800;
+int Game::screenHeight = 900;
+int Game::gameLevel = 0;
+int Game::levelSpeeds[3] = { 1, 2, 3 };
 
 int minX = 0;
 int minY = 0;
+
+bool Game::windowRunning = true;
+bool Game::isRunning = false;
+bool Game::win = false;
+
+bool Game::gamesPlayed;
 
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
@@ -33,6 +39,9 @@ auto& smurfFemale(manager.addEntity());
 auto& label(manager.addEntity());
 auto& labelHP(manager.addEntity());
 auto& labelHouse(manager.addEntity());
+auto& labelMessage(manager.addEntity());
+auto& labelWalkieTalkie(manager.addEntity());
+auto& labelGuide(manager.addEntity());
 
 Map* map;
 
@@ -41,16 +50,13 @@ Sound* bluePotionSound;
 Sound* redPotionSound;
 Sound* hitSound;
 Sound* doorSound;
-
-bool Game::isRunning = false;
-
+Sound* walkieTalkieSound;
 
 Game::Game() {}
 
 Game::~Game() {}
 
 void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
-
 	int flags = 0;
 	if (fullscreen) {
 		flags = SDL_WINDOW_FULLSCREEN;
@@ -96,7 +102,9 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	assets->addTexture("player", "animated_smurf.png");
 	assets->addTexture("smurfEngineer", "animated_engineer_smurf.png");
 	assets->addTexture("smurfFemale", "animated_female_smurf.png");
-	assets->addTexture("projectile", "charchabil.png");
+	assets->addTexture("cat", "cat_animated.png");
+	assets->addTexture("gargamel", "animated_gargamel.png");
+	assets->addTexture("walkietalkie", "walkie_talkie.png");
 	assets->addTexture("collider", "empty.png");
 
 	assets->addTexture("HP10", "hp_10.png");
@@ -117,21 +125,21 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	assets->addSound("walk", "walk.wav");
 	assets->addSound("hit", "hit.wav");
 	assets->addSound("door", "door.wav");
-
+	assets->addSound("walkieTalkie", "walkie_talkie.wav");
 	assets->addSound("redPotionSound", "red_potion.wav");
 	assets->addSound("bluePotionSound", "blue_potion.wav");
-	
+
 	map = new Map("terrain", 1, 32, 8192, 4096);
 
 	map->loadMap("map.map", 256, 173);
 
-	player.addComponent<TransformComponent>(470,2327,32,32,3);
+	player.addComponent<TransformComponent>(470, 2327, 32, 32, 3);
 	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
 	player.addComponent<ColliderComponent>("player");
 	player.addComponent<HealthComponent>(100);
 	player.addComponent<SoundComponent>();
-	player.getComponent<SoundComponent>().addSound("walk","walk");
+	player.getComponent<SoundComponent>().addSound("walk", "walk");
 	player.addGroup(groupPlayers);
 
 	smurfEngineer.addComponent<TransformComponent>(100000, 100000, 32, 32, 3);
@@ -148,22 +156,23 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	smurfFemale.addComponent<FindComponent>();
 	smurfFemale.addGroup(groupPlayers);
 
+	assets->createProjectile(Vector2D(840, 2400), Vector2D(0, 0), 1, 0, "projectile", 3, true, 3);
+	assets->createProjectile(Vector2D(2400, 2400), Vector2D(0, 0), 1, 0, "projectile", 3, true, 3);
+	assets->createProjectile(Vector2D(640, 200), Vector2D(0, 0), 1, 0, "projectile", 3, true, 3);
+	assets->createProjectile(Vector2D(640, 600), Vector2D(0, 0), 1, 0, "projectile", 3, true, 3);
+	assets->createProjectile(Vector2D(4000, 4000), Vector2D(0, 0), 1, 0, "projectile", 3, true, 3);
+	assets->createProjectile(Vector2D(4800, 560), Vector2D(0, 0), 1, 0, "projectile", 3, true, 3);
+	assets->createProjectile(Vector2D(4800, 800), Vector2D(0, 0), 1, 0, "projectile", 3, true, 3);
+
 	SDL_Color white = { 255,255,255, 255 };
 	SDL_Color black = { 0, 0, 0, 255 };
 	label.addComponent<UILabel>(10, 10, "", "arial", white, true);
 	label.addGroup(Game::groupLabels);
-
+	labelMessage.addComponent<UILabel>(10, 50, "Walkie Talkie Message:", "arial", black, true);
+	labelWalkieTalkie.addComponent<UILabel>(10, 70, "", "arial", white, true);
+	labelGuide.addComponent<UILabel>(10, 90, "Find the smurf engineer to help you decrypt the message.", "arial", black, true);
 	labelHouse.addComponent<UILabel>(5950, 4880, "Press Y to leave", "arial", black, false, 100);
-
 	labelHP.addComponent<UILabel>(10, 30, "", "arial", white, true);
-
-	assets->createProjectile(Vector2D(840, 2400), Vector2D(0,0), 1, 0, "projectile");
-	assets->createProjectile(Vector2D(2400, 2400), Vector2D(0, 0), 1, 0, "projectile");
-	assets->createProjectile(Vector2D(640, 200), Vector2D(0, 0), 1, 0, "projectile");
-	assets->createProjectile(Vector2D(640, 600), Vector2D(0, 0), 1, 0, "projectile");
-	assets->createProjectile(Vector2D(4000, 4000), Vector2D(0, 0), 1, 0, "projectile");
-	assets->createProjectile(Vector2D(4800, 560), Vector2D(0, 0), 1, 0, "projectile");
-	assets->createProjectile(Vector2D(4800, 800), Vector2D(0, 0), 1, 0, "projectile");
 
 	backgroundMusic = new Sound("background", 0.1);
 	backgroundMusic->play(-1);
@@ -172,21 +181,82 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	bluePotionSound = new Sound("bluePotionSound", 1);
 	hitSound = new Sound("hit", 1);
 	doorSound = new Sound("door", 1);
-
-	this->SmurfEngineerHouse = rand() % 7;
-	this->SmurfFemaleHouse = rand() % 7;
-	while(this->SmurfEngineerHouse == this->SmurfFemaleHouse) this->SmurfFemaleHouse = rand() % 7;
+	walkieTalkieSound = new Sound("walkieTalkie", 1);
 
 }
 
 auto& tiles(manager.getGroup(Game::groupMap));
 auto& players(manager.getGroup(Game::groupPlayers));
 auto& colliders(manager.getGroup(Game::groupColliders));
-auto& projectiles(manager.getGroup(Game::groupProjectiles));
+auto& projectiles(manager.getGroup(Game::groupCats));
 auto& labels(manager.getGroup(Game::groupLabels));
 
-auto& redPotions(manager.getGroup(Game::groupeRedPotions));
-auto& bluePotions(manager.getGroup(Game::groupeBluePotions));
+auto& redPotions(manager.getGroup(Game::groupRedPotions));
+auto& bluePotions(manager.getGroup(Game::groupBluePotions));
+auto& gargamels(manager.getGroup(Game::groupGargamel));
+auto& walkieTalkies(manager.getGroup(Game::groupWalkieTalkie));
+
+void Game::reset() {
+
+	this->SmurfEngineerHouse = rand() % 7;
+	this->SmurfFemaleHouse = rand() % 7;
+	while (this->SmurfEngineerHouse == this->SmurfFemaleHouse) this->SmurfFemaleHouse = rand() % 7;
+
+	if (this->crpytographer) delete this->crpytographer;
+	this->crpytographer = new Cryptographer();
+	this->crpytographer->message = "Female Smurf is in house: " + std::to_string(this->SmurfFemaleHouse);
+
+
+	this->playerNearHouseID = -1;
+	this->gargamelSpawned = false;
+	this->gargamelAlive = true;
+	this->walkieTalkieFound = false;
+
+	for (auto& r : redPotions) {
+		r->destroy();
+	}
+
+	for (auto& b : bluePotions) {
+		b->destroy();
+	}
+
+	for (auto& c : projectiles) {
+		c->destroy();
+	}
+
+	for (auto& g : gargamels) {
+		g->destroy();
+	}
+
+	player.getComponent<SoundComponent>().sounds["walk"]->stop();
+
+	manager.refresh();
+	manager.update();
+
+	map->loadMap("map.map", 256, 173, true);
+
+	assets->createProjectile(Vector2D(840, 2400), Vector2D(0, 0), 1, 0, "cat", 3, true, 3);
+	assets->createProjectile(Vector2D(2400, 2400), Vector2D(0, 0), 1, 0, "cat", 3, true, 3);
+	assets->createProjectile(Vector2D(640, 200), Vector2D(0, 0), 1, 0, "cat", 3, true, 3);
+	assets->createProjectile(Vector2D(640, 600), Vector2D(0, 0), 1, 0, "cat", 3, true, 3);
+	assets->createProjectile(Vector2D(4000, 4000), Vector2D(0, 0), 1, 0, "cat", 3, true, 3);
+	assets->createProjectile(Vector2D(4800, 560), Vector2D(0, 0), 1, 0, "cat", 3, true, 3);
+	assets->createProjectile(Vector2D(4800, 800), Vector2D(0, 0), 1, 0, "cat", 3, true, 3);
+
+	assets->createProjectile(Vector2D(3746, 1217), Vector2D(0, 0), 1, 0, "walkietalkie", 5, false, 3);
+
+	player.getComponent<TransformComponent>().reset(470, 2327);
+	smurfEngineer.getComponent<TransformComponent>().reset(100000, 100000);
+	smurfFemale.getComponent<TransformComponent>().reset(100000, 100000);
+
+	smurfEngineer.getComponent<FindComponent>().reset();
+	smurfFemale.getComponent<FindComponent>().reset();
+
+	player.getComponent<HealthComponent>().reset();
+	if(smurfEngineer.hasComponent<HealthComponent>()) smurfEngineer.delComponent<HealthComponent>();
+	if (smurfFemale.hasComponent<HealthComponent>()) smurfFemale.delComponent<HealthComponent>();
+
+}
 
 void Game::handleEvents() {
 	SDL_PollEvent(&event);
@@ -194,6 +264,7 @@ void Game::handleEvents() {
 	{
 	case SDL_QUIT:
 		this->isRunning = false;
+		windowRunning = false;
 		break;
 	default:
 		break;
@@ -212,6 +283,15 @@ void Game::update() {
 	SDL_Rect smurfFemaleCol = smurfFemale.getComponent<ColliderComponent>().collider;
 	Vector2D smurfFemalePos = smurfFemale.getComponent<TransformComponent>().position;
 
+	SDL_Rect garmagelCol;
+	Vector2D gargamelPos;
+
+	if (gargamelSpawned) {
+		garmagelCol = gargamels[0]->getComponent<ColliderComponent>().collider;
+		gargamelPos = gargamels[0]->getComponent<TransformComponent>().position;
+	}
+
+
 	smurfEngineer.getComponent<TransformComponent>().chase(playerPos);
 	if(smurfFemale.getComponent<FindComponent>().isSpawnedInMainMap()) smurfFemale.getComponent<TransformComponent>().chase(smurfEngineerPos);
 	else smurfFemale.getComponent<TransformComponent>().chase(playerPos);
@@ -219,6 +299,17 @@ void Game::update() {
 	std::stringstream ss;
 	ss << "Player position: (" << playerPos.x << ", " << playerPos.y << ")";
 	label.getComponent<UILabel>().setLabelText(std::move(ss).str(), "arial");
+	
+	if (!smurfEngineer.getComponent<FindComponent>().isFound()) {
+		if (!this->crpytographer->isEncrypted()) {
+			this->crpytographer->encrypt();
+		} 
+	}
+	else {
+		if (this->crpytographer->isEncrypted()) this->crpytographer->decrypt();
+	}
+
+	labelWalkieTalkie.getComponent<UILabel>().setLabelText(this->crpytographer->message, "arial");
 
 	manager.refresh();
 	manager.update();
@@ -254,8 +345,18 @@ void Game::update() {
 		}
 	}
 
+	if (gargamelSpawned) {
+		for (auto& c : colliders) {
+			SDL_Rect cCol = c->getComponent<ColliderComponent>().collider;
+			if (Collision::AABB(cCol, garmagelCol)) {
+				gargamels[0]->getComponent<TransformComponent>().position = gargamelPos;
+				gargamels[0]->getComponent<SpriteComponent>().play("idle");
+			}
+		}
+	}
+
 	for (auto& p : projectiles) {
-		p->getComponent<TransformComponent>().chase(playerPos,Game::gameLevel);
+		p->getComponent<TransformComponent>().chase(playerPos);
 		for (auto& pl : players)
 		{
 			if (Collision::AABB(pl->getComponent<ColliderComponent>().collider, p->getComponent<ColliderComponent>().collider)) {
@@ -267,6 +368,32 @@ void Game::update() {
 		}
 	}
 
+	for (auto& w : walkieTalkies) {
+		for (auto& pl : players)
+		{
+			if (Collision::AABB(pl->getComponent<ColliderComponent>().collider, w->getComponent<ColliderComponent>().collider)) {
+				this->walkieTalkieFound = true;
+				walkieTalkieSound->play(0);
+				walkieTalkieSound->playing = false;
+				w->destroy();
+			}
+		}
+	}
+
+	if (gargamelSpawned) {
+		gargamels[0]->getComponent<TransformComponent>().chase(playerPos);
+		for (auto& pl : players) {
+			if (Collision::AABB(pl->getComponent<ColliderComponent>().collider, gargamels[0]->getComponent<ColliderComponent>().collider)) {
+				pl->getComponent<HealthComponent>().decreaseHP(70);
+				hitSound->play(0);
+				hitSound->playing = false;
+				gargamels[0]->destroy();
+				gargamelSpawned = false;
+				gargamelAlive = false;
+			}
+		}
+	}
+	
 	for (auto& r : redPotions) {
 		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, r->getComponent<ColliderComponent>().collider)) {
 
@@ -297,8 +424,20 @@ void Game::update() {
 	if (camera.x > camera.w - screenWidth) camera.x = camera.w - screenWidth;
 	if (camera.y > camera.h - screenHeight) camera.y = camera.h - screenHeight;
 
-	if (player.getComponent<HealthComponent>().getHealth() == 0) isRunning = false;
+	if (player.getComponent<HealthComponent>().getHealth() == 0) {
+		player.getComponent<SoundComponent>().sounds["walk"]->stop();
+		isRunning = false;
+	} 
+
+	if (smurfEngineer.hasComponent<HealthComponent>() && smurfEngineer.getComponent<HealthComponent>().getHealth() == 0) {
+		player.getComponent<SoundComponent>().sounds["walk"]->stop();
+		isRunning = false;
+	}
 	
+	if (smurfFemale.hasComponent<HealthComponent>() && smurfFemale.getComponent<HealthComponent>().getHealth() == 0) {
+		player.getComponent<SoundComponent>().sounds["walk"]->stop();
+		isRunning = false;
+	}
 
 	std::stringstream playerHp; 
 	playerHp << "Player HP: " << player.getComponent<HealthComponent>().getHealth();
@@ -419,11 +558,25 @@ void Game::update() {
 		}
 	}
 
-	bool win = true;
+	win = true;
 	for (auto& pl : players) {
 		win *= sqrt(pow(pl->getComponent<TransformComponent>().position.x - 8050, 2) + pow(pl->getComponent<TransformComponent>().position.y - 70, 2)) <= 200;
 	}
-	if (win) this->isRunning = false;
+	if (win) {
+		player.getComponent<SoundComponent>().sounds["walk"]->stop();
+		this->isRunning = false;
+	} 
+
+	bool nearGamrgamelHouse = true;
+	for (auto& pl : players) {
+		nearGamrgamelHouse *= sqrt(pow(pl->getComponent<TransformComponent>().position.x - 7150, 2) + pow(pl->getComponent<TransformComponent>().position.y - 855, 2)) <= 700;
+	}
+	if (nearGamrgamelHouse) {
+		if (!gargamelSpawned && gargamelAlive) {
+			assets->createProjectile(Vector2D(7150, 855), Vector2D(0, 0), 1, 0, "gargamel", 4, true, 5);
+			gargamelSpawned = true;
+		}
+	}
 }
 
 void Game::render() {
@@ -471,6 +624,16 @@ void Game::render() {
 	{
 		b->draw();
 	}
+
+	if(gargamelSpawned) gargamels[0]->draw();
+
+	for (auto& w : walkieTalkies) {
+		w->draw();
+	}
+	
+	if (this->walkieTalkieFound) labelMessage.draw();
+	if (this->walkieTalkieFound) labelWalkieTalkie.draw();
+	if (this->walkieTalkieFound && !smurfEngineer.getComponent<FindComponent>().isFound()) labelGuide.draw();
 
 	SDL_RenderPresent(this->renderer);
 }

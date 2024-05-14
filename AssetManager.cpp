@@ -13,10 +13,10 @@ SDL_Texture* AssetManager::getTexture(std::string id) {
 	return this->textures[id];
 }
 
-void AssetManager::createProjectile(Vector2D pos, Vector2D vel, int range, int speed, std::string id, int potionType) {
+void AssetManager::createProjectile(Vector2D pos, Vector2D vel, int range, int speed, std::string id, int potionType, bool animated, int scale) {
 	auto& projectile(manager->addEntity());
-	projectile.addComponent<TransformComponent>(pos.x, pos.y, 32, 32, 2);
-	projectile.addComponent<SpriteComponent>(id, false);
+	projectile.addComponent<TransformComponent>(pos.x, pos.y, 32, 32, scale);
+	projectile.addComponent<SpriteComponent>(id, animated);
 	projectile.addComponent<ProjectileComponent>(range, speed, vel, potionType );
 	projectile.addComponent<ColliderComponent>("projectile");
 
@@ -25,10 +25,19 @@ void AssetManager::createProjectile(Vector2D pos, Vector2D vel, int range, int s
 			projectile.addGroup(Game::groupProjectiles);
 			break;
 		case 1 :
-			projectile.addGroup(Game::groupeRedPotions);
+			projectile.addGroup(Game::groupRedPotions);
 			break;
 		case 2:
-			projectile.addGroup(Game::groupeBluePotions);
+			projectile.addGroup(Game::groupBluePotions);
+			break;
+		case 3:
+			projectile.addGroup(Game::groupCats);
+			break;
+		case 4:
+			projectile.addGroup(Game::groupGargamel);
+			break;
+		case 5:
+			projectile.addGroup(Game::groupWalkieTalkie);
 			break;
 		default:
 			break;

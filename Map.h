@@ -11,8 +11,8 @@ public:
 	~Map();
 
 	void addTile(int srcX, int srcY, int xpos, int ypos);
-	void loadMap(std::string path, int sizeX, int sizeY);
-	void drawMap();
+	void loadMap(std::string path, int sizeX, int sizeY, bool reset = false);
+	//void drawMap();
 
 	int getWidth() { return this->width; }
 	int getHeight() { return this->height; }

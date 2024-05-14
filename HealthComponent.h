@@ -74,6 +74,10 @@ public:
 		this->health = this->health + amount > 100 ? 100 : this->health + amount;
 	}
 
+	void reset() {
+		this->health = 100;
+	}
+
 	int getHealth() { return this->health;}
 
 private:

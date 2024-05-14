@@ -8,6 +8,7 @@
 #include <SDL_mixer.h>
 #include "TextureManager.h"
 #include "AssetManager.h"
+#include "Cryptographer.h"
 
 class ColliderComponent;
 class AssetManager;
@@ -23,6 +24,7 @@ public:
 	void update();
 	void render();
 	void clean();
+	void reset();
 
 	bool running() { return this->isRunning; }
 
@@ -35,6 +37,14 @@ public:
 	static int screenHeight;
 	static int screenWidth;
 	static int gameLevel;
+	static int levelSpeeds[3];
+
+	static bool windowRunning;
+
+	static bool win;
+	static bool gamesPlayed;
+
+	Cryptographer *crpytographer;
 
 	enum groupLabels : std::size_t {
 		groupMap,
@@ -43,12 +53,20 @@ public:
 		groupColliders,
 		groupProjectiles,
 		groupLabels,
-		groupeRedPotions,
-		groupeBluePotions
+		groupRedPotions,
+		groupBluePotions,
+		groupCats,
+		groupGargamel,
+		groupWalkieTalkie
 	};
 
 	int SmurfEngineerHouse;
 	int SmurfFemaleHouse;
+
+	int playerNearHouseID = -1;
+	bool gargamelSpawned = false;
+	bool gargamelAlive = true;
+	bool walkieTalkieFound = false;
 
 private:
 
