@@ -34,8 +34,11 @@ void Menu::menuLoop() {
     this->running = true;
     bool inLevelSelection = false;
 
-
     while (this->running) {
+
+        this->hoveredButton = -1;
+        this->selectedButton = 0;
+
         while (this->running && !inLevelSelection) {
             SDL_Event event;
             while (SDL_PollEvent(&event)) {
@@ -64,7 +67,7 @@ void Menu::menuLoop() {
                         case 2:
                             this->running = false;
                             Game::isRunning = false;
-                            Game::windowRunning;
+                            Game::windowRunning = false;
                             break;
                         }
                         break;
@@ -148,6 +151,9 @@ void Menu::menuLoop() {
 
         }
 
+        this->hoveredButton = -1;
+        this->selectedButton = 0;
+
         while (inLevelSelection) {
             SDL_Event event;
             while (SDL_PollEvent(&event)) {
@@ -161,12 +167,15 @@ void Menu::menuLoop() {
                     switch (event.key.keysym.sym) {
                         case SDLK_UP:
                             this->selectedButton = (this->selectedButton - 1 + 3) % 3;
+                            Game::gameLevel = 0;
                             break;
                         case SDLK_DOWN:
                             this->selectedButton = (this->selectedButton + 1) % 3;
+                            Game::gameLevel = 1;
                             break;
                         case SDLK_RETURN:
                             inLevelSelection = false;
+                            Game::gameLevel = 2;
                             break;
                     }
                 }
@@ -219,7 +228,7 @@ void Menu::menuLoop() {
             renderText("Hard", "freeman", Game::screenWidth / 2, Game::screenHeight / 2 + 175);
 
             for (int i = 0; i < 3; ++i) {
-                SDL_Color borderColor = SDL_Color{ 255, 255, 255, 255 };
+                SDL_Color borderColor = (i == this->selectedButton) ? this->selectColor : SDL_Color{ 255, 255, 255, 255 };
                 if (i == this->hoveredButton) {
                     borderColor = this->hoverColor;
                 }

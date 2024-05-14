@@ -29,6 +29,8 @@ int main(int argc, char* argv[]) {
 				switch (Game::event.key.keysym.sym) {
 
 				case SDLK_ESCAPE:
+					Game::paused = true;
+					game->update();
 					menu->menuLoop();
 					break;
 				default:
@@ -36,6 +38,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
+			Game::paused = false;
 			game->update();
 			game->render();
 

@@ -43,6 +43,7 @@ public:
 
 	static bool win;
 	static bool gamesPlayed;
+	static bool paused;
 
 	Cryptographer *crpytographer;
 

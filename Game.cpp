@@ -21,8 +21,8 @@ int minY = 0;
 bool Game::windowRunning = true;
 bool Game::isRunning = false;
 bool Game::win = false;
-
 bool Game::gamesPlayed;
+bool Game::paused = false;
 
 SDL_Renderer* Game::renderer = nullptr;
 Manager manager;
@@ -211,6 +211,7 @@ void Game::reset() {
 	this->gargamelSpawned = false;
 	this->gargamelAlive = true;
 	this->walkieTalkieFound = false;
+	paused = false;
 
 	for (auto& r : redPotions) {
 		r->destroy();
@@ -577,6 +578,13 @@ void Game::update() {
 			gargamelSpawned = true;
 		}
 	}
+
+	if (paused) {
+		player.getComponent<TransformComponent>().velocity.zero();
+		player.getComponent<SoundComponent>().sounds["walk"]->stop();
+		player.getComponent<SpriteComponent>().play("idle");
+	}
+
 }
 
 void Game::render() {
