@@ -38,6 +38,8 @@ public:
 	static int screenWidth;
 	static int gameLevel;
 	static int levelSpeeds[3];
+	static float redPotionsProbabilities[3];
+	static float bluePotionsProbabilities[3];
 
 	static bool windowRunning;
 

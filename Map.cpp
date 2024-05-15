@@ -70,7 +70,7 @@ void Map::loadMap(std::string path,  int sizeX, int sizeY, bool reset) {
 		for (int x = 0; x < sizeX; ++x) {
 			mapFile.get(c);
 			if (c == '1') {
-				if((float)rand() / RAND_MAX < 0.3)
+				if((float)rand() / RAND_MAX < Game::redPotionsProbabilities[Game::gameLevel])
 					Game::assets->createProjectile(Vector2D(x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale), Vector2D(0, 0), 1, 0, "redPotion", 1);
 			}
 			mapFile.ignore();
@@ -83,7 +83,7 @@ void Map::loadMap(std::string path,  int sizeX, int sizeY, bool reset) {
 		for (int x = 0; x < sizeX; ++x) {
 			mapFile.get(c);
 			if (c == '1') {
-				if ((float)rand() / RAND_MAX < 0.2)
+				if ((float)rand() / RAND_MAX < Game::bluePotionsProbabilities[Game::gameLevel])
 					Game::assets->createProjectile(Vector2D(x * this->tileSize * this->mapScale, y * this->tileSize * this->mapScale), Vector2D(0, 0), 1, 0, "bluePotion", 2);
 			}
 			mapFile.ignore();

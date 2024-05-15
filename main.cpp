@@ -15,8 +15,8 @@ int main(int argc, char* argv[]) {
 
 	while (Game::windowRunning) {
 
-		game->reset();
 		menu->menuLoop();
+		game->reset();
 
 		Game::gamesPlayed = false;
 		while (game->running()) {

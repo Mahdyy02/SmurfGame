@@ -13,7 +13,9 @@
 int Game::screenWidth = 1800;
 int Game::screenHeight = 900;
 int Game::gameLevel = 0;
-int Game::levelSpeeds[3] = { 1, 2, 3 };
+int Game::levelSpeeds[3] = { 1, 1, 2 };
+float Game::redPotionsProbabilities[3] = {0.4, 0.1, 0.3};
+float Game::bluePotionsProbabilities[3] = {0.5, 0.01, 0.2};
 
 int minX = 0;
 int minY = 0;
@@ -229,8 +231,6 @@ void Game::reset() {
 		g->destroy();
 	}
 
-	player.getComponent<SoundComponent>().sounds["walk"]->stop();
-
 	manager.refresh();
 	manager.update();
 
@@ -293,9 +293,9 @@ void Game::update() {
 	}
 
 
-	smurfEngineer.getComponent<TransformComponent>().chase(playerPos);
-	if(smurfFemale.getComponent<FindComponent>().isSpawnedInMainMap()) smurfFemale.getComponent<TransformComponent>().chase(smurfEngineerPos);
-	else smurfFemale.getComponent<TransformComponent>().chase(playerPos);
+	smurfEngineer.getComponent<TransformComponent>().chase(playerPos, false);
+	if(smurfFemale.getComponent<FindComponent>().isSpawnedInMainMap()) smurfFemale.getComponent<TransformComponent>().chase(smurfEngineerPos, false);
+	else smurfFemale.getComponent<TransformComponent>().chase(playerPos, false);
 
 	std::stringstream ss;
 	ss << "Player position: (" << playerPos.x << ", " << playerPos.y << ")";
@@ -579,7 +579,7 @@ void Game::update() {
 		}
 	}
 
-	if (paused) {
+	if (paused || !isRunning) {
 		player.getComponent<TransformComponent>().velocity.zero();
 		player.getComponent<SoundComponent>().sounds["walk"]->stop();
 		player.getComponent<SpriteComponent>().play("idle");

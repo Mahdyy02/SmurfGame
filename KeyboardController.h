@@ -19,7 +19,7 @@ public:
     void update() override {
         static SDL_Keycode currentKey = SDLK_UNKNOWN;
 
-        if (Game::paused) currentKey = SDLK_UNKNOWN;
+        if (Game::paused || !Game::isRunning) currentKey = SDLK_UNKNOWN;
 
         if (Game::event.type == SDL_KEYDOWN) {
             if (currentKey == SDLK_UNKNOWN) {

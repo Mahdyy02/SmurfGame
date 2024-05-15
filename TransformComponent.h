@@ -59,12 +59,13 @@ public:
 
 	}
 
-	void chase(Vector2D target) {
+	void chase(Vector2D target, bool isEnemy = true) {
 		if (sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) <= 750 &&
 			sqrt(pow(target.x - this->position.x, 2) + pow(target.y - this->position.y, 2)) >= 32*this->scale) {
 			Vector2D direction = target - this->position + Vector2D(-32 * this->scale, 0);
 			direction.normalize();
-			this->velocity = direction*Game::levelSpeeds[Game::gameLevel];
+			if (isEnemy) this->velocity = direction * Game::levelSpeeds[Game::gameLevel];
+			else this->velocity = direction;
 		}
 		else {
 			this->velocity.zero();
