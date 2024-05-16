@@ -15,16 +15,14 @@ Sound::Sound(std::string id, float volume) {
 }
 
 void Sound::play(int times) {
-
 	if (!this->playing) {
-
-		this->playing = true;
+		this->playing = true; 
 
 		Mix_PlayChannel(this->channel, this->sound, times);
 		Mix_VolumeChunk(this->sound, static_cast<int>(MIX_MAX_VOLUME * this->volume));
 	}
-
 }
+
 
 void Sound::stop() {
 	this->playing = false;

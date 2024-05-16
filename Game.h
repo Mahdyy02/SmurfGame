@@ -44,7 +44,7 @@ public:
 	static bool windowRunning;
 
 	static bool win;
-	static bool gamesPlayed;
+	static bool gamePlayed;
 	static bool paused;
 
 	Cryptographer *crpytographer;

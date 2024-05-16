@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 		menu->menuLoop();
 		game->reset();
 
-		Game::gamesPlayed = false;
+		Game::gamePlayed = false;
 		while (game->running()) {
 
 			frameStart = SDL_GetTicks();
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 				SDL_Delay(FrameDelay - frameTime);
 			}
 		}
-		Game::gamesPlayed = true;
+		Game::gamePlayed = true;
 	}
 
 	game->clean();

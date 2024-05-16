@@ -122,7 +122,7 @@ void Menu::menuLoop() {
 
             renderText("SANFOURA", "skincake", Game::screenWidth / 2, 75);
 
-            if (Game::gamesPlayed) {
+            if (Game::gamePlayed) {
                 if (Game::win) renderText("Winner Winner! Chicken dinner...!", "freeman", Game::screenWidth / 2, 125, 254, 238, 155);
                 else renderText("You lost...", "freeman", Game::screenWidth / 2, 125, 179, 92, 89);
             }

@@ -7,6 +7,7 @@
 #include <iostream>
 #include "AssetManager.h"
 
+
 class Sound {
 
 public:
@@ -14,10 +15,9 @@ public:
 	bool playing = false;
 
 	Sound(std::string id, float volume);
-	~Sound();
+	~Sound(){}
 
-	bool isPlaying() { return this->playing; }
-	void setSound(std::string id);
+	bool isPlaying() const { return this->playing; }
 	void play(int times);
 	void stop();
 	void setVolume(float v);

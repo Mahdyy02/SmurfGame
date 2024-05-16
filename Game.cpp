@@ -10,12 +10,14 @@
 #include "Vector2D.h"
 #include "Collision.h"
 
+Uint32 startTime;
+
 int Game::screenWidth = 1800;
 int Game::screenHeight = 900;
 int Game::gameLevel = 0;
 int Game::levelSpeeds[3] = { 1, 1, 2 };
-float Game::redPotionsProbabilities[3] = {0.4, 0.1, 0.3};
-float Game::bluePotionsProbabilities[3] = {0.5, 0.01, 0.2};
+float Game::redPotionsProbabilities[3] = {0.4, 0.25, 0.3};
+float Game::bluePotionsProbabilities[3] = {0.5, 0.15, 0.2};
 
 int minX = 0;
 int minY = 0;
@@ -23,7 +25,7 @@ int minY = 0;
 bool Game::windowRunning = true;
 bool Game::isRunning = false;
 bool Game::win = false;
-bool Game::gamesPlayed;
+bool Game::gamePlayed;
 bool Game::paused = false;
 
 SDL_Renderer* Game::renderer = nullptr;
@@ -53,6 +55,10 @@ Sound* redPotionSound;
 Sound* hitSound;
 Sound* doorSound;
 Sound* walkieTalkieSound;
+Sound* storyOne;
+Sound* storyTwo;
+Sound* storyThree;
+Sound* storyFour;
 
 Game::Game() {}
 
@@ -94,6 +100,10 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 		isRunning = false;
 	}
 
+	if (Mix_AllocateChannels(16) == -1) {
+		printf("Error allocating channels: %s\n", Mix_GetError());
+	}
+
 	int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
 	if (!(IMG_Init(imgFlags) & imgFlags)) {
 		printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
@@ -130,6 +140,16 @@ void Game::init(const char* title, int xpos, int ypos, bool fullscreen) {
 	assets->addSound("walkieTalkie", "walkie_talkie.wav");
 	assets->addSound("redPotionSound", "red_potion.wav");
 	assets->addSound("bluePotionSound", "blue_potion.wav");
+	assets->addSound("story1", "story_1.wav");
+	assets->addSound("story2", "story_2.wav");
+	assets->addSound("story3", "story_3.wav");
+	assets->addSound("story4", "story_4.wav");
+
+	storyOne = new Sound("story1", 0.5);
+	storyTwo = new Sound("story2", 0.5);
+	storyThree = new Sound("story3", 0.5);
+	storyFour = new Sound("story4", 0.5);
+
 
 	map = new Map("terrain", 1, 32, 8192, 4096);
 
@@ -200,6 +220,9 @@ auto& walkieTalkies(manager.getGroup(Game::groupWalkieTalkie));
 
 void Game::reset() {
 
+	storyOne->play(0);
+	startTime = SDL_GetTicks();
+
 	this->SmurfEngineerHouse = rand() % 7;
 	this->SmurfFemaleHouse = rand() % 7;
 	while (this->SmurfEngineerHouse == this->SmurfFemaleHouse) this->SmurfFemaleHouse = rand() % 7;
@@ -244,7 +267,7 @@ void Game::reset() {
 	assets->createProjectile(Vector2D(4800, 560), Vector2D(0, 0), 1, 0, "cat", 3, true, 3);
 	assets->createProjectile(Vector2D(4800, 800), Vector2D(0, 0), 1, 0, "cat", 3, true, 3);
 
-	assets->createProjectile(Vector2D(3746, 1217), Vector2D(0, 0), 1, 0, "walkietalkie", 5, false, 3);
+	assets->createProjectile(Vector2D(3746, 1217), Vector2D(0, 0), 1, 0, "walkietalkie", 5, false, 2);
 
 	player.getComponent<TransformComponent>().reset(470, 2327);
 	smurfEngineer.getComponent<TransformComponent>().reset(100000, 100000);
@@ -274,6 +297,28 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
+
+	Uint32 currentTime = SDL_GetTicks();
+	float elapsedTime = (currentTime - startTime) / 1000.0f; 
+
+	if (elapsedTime >= 40.0f) {
+		storyOne->playing = false;
+		std::cout << storyTwo->playing << std::endl;
+		storyTwo->play(0);
+	}
+
+	if (elapsedTime >= 80.0f) {
+		storyTwo->playing = false;
+		storyThree->play(0);
+	}
+
+	if (elapsedTime >= 120.0f) {
+		storyThree->playing = false;
+	}
+
+	if (smurfFemale.getComponent<FindComponent>().isFound() && !storyFour->playing) {
+		storyFour->play(0);
+	}
 
 	SDL_Rect playerCol = player.getComponent<ColliderComponent>().collider;
 	Vector2D playerPos = player.getComponent<TransformComponent>().position;
@@ -385,7 +430,7 @@ void Game::update() {
 		gargamels[0]->getComponent<TransformComponent>().chase(playerPos);
 		for (auto& pl : players) {
 			if (Collision::AABB(pl->getComponent<ColliderComponent>().collider, gargamels[0]->getComponent<ColliderComponent>().collider)) {
-				pl->getComponent<HealthComponent>().decreaseHP(70);
+				pl->getComponent<HealthComponent>().decreaseHP(90);
 				hitSound->play(0);
 				hitSound->playing = false;
 				gargamels[0]->destroy();
@@ -399,7 +444,7 @@ void Game::update() {
 		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, r->getComponent<ColliderComponent>().collider)) {
 
 			for (auto& pl : players) {
-				if(pl->hasComponent<HealthComponent>()) pl->getComponent<HealthComponent>().increaseHP(30);
+				if(pl->hasComponent<HealthComponent>()) pl->getComponent<HealthComponent>().increaseHP(20);
 			}
 			redPotionSound->play(0);
 			redPotionSound->playing = false;
@@ -409,7 +454,7 @@ void Game::update() {
 
 	for (auto& b : bluePotions) {
 		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, b->getComponent<ColliderComponent>().collider)) {
-			player.getComponent<HealthComponent>().increaseHP(60);
+			player.getComponent<HealthComponent>().increaseHP(30);
 			bluePotionSound->play(0);
 			bluePotionSound->playing = false;
 			b->destroy();
@@ -545,6 +590,11 @@ void Game::update() {
 				smurfEngineer.getComponent<FindComponent>().isSpawnedInMainMap() &&
 				!smurfFemale.getComponent<FindComponent>().isSpawnedInMainMap()) 
 			{
+
+				if (!storyThree->playing) {
+					storyFour->play(0);
+				}
+
 				if (playerNearHouseID == 6) {
 					smurfFemale.getComponent<TransformComponent>().position = Vector2D(4614, 2985);
 					smurfFemale.getComponent<FindComponent>().setSpawnedInMap();
