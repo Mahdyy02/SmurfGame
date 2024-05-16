@@ -303,7 +303,6 @@ void Game::update() {
 
 	if (elapsedTime >= 40.0f) {
 		storyOne->playing = false;
-		std::cout << storyTwo->playing << std::endl;
 		storyTwo->play(0);
 	}
 
@@ -633,6 +632,12 @@ void Game::update() {
 		player.getComponent<TransformComponent>().velocity.zero();
 		player.getComponent<SoundComponent>().sounds["walk"]->stop();
 		player.getComponent<SpriteComponent>().play("idle");
+
+		storyOne->stop();
+		storyTwo->stop();
+		storyThree->stop();
+		storyFour->stop();
+
 	}
 
 }
